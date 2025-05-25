@@ -1,0 +1,32 @@
+﻿@model CreateVehicleModelViewModel
+
+<form asp-action="CreateVehicleModel" asp-controller="Admin" method="post" class="row g-3 mb-4">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @Html.AntiForgeryToken()
+
+    <div class="col-md-6">
+        <label asp-for="Name" class="form-label">Model:</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="BrandId" class="form-label">Marka:</label>
+        <select asp-for="BrandId" asp-items="Model.AvailableBrands" class="form-select">
+            <option value="">-- Select Brand --</option>
+        </select>
+        <span asp-validation-for="BrandId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="VehicleTypeId" class="form-label">Typ:</label>
+        <select asp-for="VehicleTypeId" asp-items="Model.AvailableVehicleTypes" class="form-select">
+            <option value="">-- Select Vehicle Type --</option>
+        </select>
+        <span asp-validation-for="VehicleTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary">Dodaj model</button>
+    </div>
+</form>

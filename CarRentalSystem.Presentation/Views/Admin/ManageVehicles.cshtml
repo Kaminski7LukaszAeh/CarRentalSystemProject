@@ -1,0 +1,96 @@
+﻿@model ManageVehiclesViewModel
+@{
+    ViewData["Title"] = "Manage Vehicles";
+}
+<div class="mb-3">
+    <button class="btn btn-secondary" onclick="history.back()">← Powrót</button>
+</div>
+
+<h2>Edytuj Pojazdy</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@await Html.PartialAsync("_AddVehiclePartial", Model.NewVehicle)
+
+<h3 class="mt-4">Dostępne Pojazdy</h3>
+
+@if (Model.Vehicles.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Marka</th>
+                <th>Model</th>
+                <th>Typ</th>
+                <th>Dzienna stawka</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var v in Model.Vehicles)
+            {
+                <tr>
+                    <td>@v.BrandName</td>
+                    <td>@v.ModelName</td>
+                    <td>@v.TypeName</td>
+                    <td>@v.DailyRate.ToString("C")</td>
+                    <td>
+                        <form asp-action="DeleteVehicle" asp-route-id="@v.Id" method="post"
+                              onsubmit="return confirm('Czy napewno chcesz skasować ten markę pojazd?');">
+                            <button class="btn btn-danger btn-sm" type="submit">Usuń</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Brak dostępnych pojazdów.</p>
+}
+@section Scripts {
+    <script>
+        $(function () {
+            $('#vehicleType').change(function () {
+                var typeId = $(this).val();
+                if (typeId) {
+                    $.get('/Admin/GetBrandsByType', { typeId: typeId }, function (brands) {
+                        var $brand = $('#vehicleBrand');
+                        $brand.empty().append('<option value="">-- Select Brand --</option>');
+                        $.each(brands, function (i, brand) {
+                            $brand.append(`<option value="${brand.id}">${brand.name}</option>`);
+                        });
+                        if (brands.length === 1) {
+                            $brand.val(brands[0].id).trigger('change');
+                        }
+                    });
+                }
+            });
+
+            $('#vehicleBrand').change(function () {
+                var brandId = $(this).val();
+                var typeId = $('#vehicleType').val();
+                if (brandId && typeId) {
+                    $.get('/Admin/GetModelsByBrandAndType', { brandId: brandId, typeId: typeId }, function (models) {
+                        var $model = $('#vehicleModel');
+                        $model.empty().append('<option value="">-- Select Model --</option>');
+                        $.each(models, function (i, model) {
+                            $model.append(`<option value="${model.id}">${model.name}</option>`);
+                        });
+                        if (models.length === 1) {
+                            $model.val(models[0].id);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

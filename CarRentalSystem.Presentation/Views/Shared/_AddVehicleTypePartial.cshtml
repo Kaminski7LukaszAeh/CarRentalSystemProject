@@ -1,0 +1,10 @@
+﻿@model CreateVehicleTypeViewModel
+
+<form asp-action="AddVehicleType" method="post">
+    <div class="form-group">
+        <label asp-for="TypeName"></label>
+        <input asp-for="TypeName" class="form-control" />
+        <span asp-validation-for="TypeName" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Dodaj typ</button>
+</form>

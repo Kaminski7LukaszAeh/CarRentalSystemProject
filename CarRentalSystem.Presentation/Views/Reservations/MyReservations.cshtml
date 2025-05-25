@@ -1,0 +1,36 @@
+﻿@model List<ReservationViewModel>
+
+<h2>Moje Rezerwacje</h2>
+
+@if (!Model.Any())
+{
+    <p>Nie masz jeszcze rezerwacji.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Pojazd</th>
+                <th>Data wypożyczenia</th>
+                <th>Data zwrotu</th>
+                <th>Data rezerwacji</th>
+                <th>Całkowity koszt</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reservation in Model)
+            {
+                <tr>
+                    <td>@reservation.BrandName @reservation.ModelName (@reservation.VehicleTypeName)</td>
+                    <td>@reservation.StartDate.ToShortDateString()</td>
+                    <td>@reservation.EndDate.ToShortDateString()</td>
+                    <td>@reservation.CreatedAt.ToShortDateString()</td>
+                    <td>@reservation.TotalCost</td>
+                    <td>@reservation.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

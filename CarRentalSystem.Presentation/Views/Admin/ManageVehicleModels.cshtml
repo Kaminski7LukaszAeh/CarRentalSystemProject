@@ -1,0 +1,63 @@
+﻿@model ManageVehicleModelsViewModel
+@{
+    ViewData["Title"] = "Manage Vehicle Models";
+}
+<div class="mb-3">
+    <button class="btn btn-secondary" onclick="history.back()">← Powrót</button>
+</div>
+
+<h2>Edytuj modele</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@await Html.PartialAsync("_AddVehicleModelPartial", Model.NewVehicleModel)
+
+<h3 class="mt-4">Dostępne modele</h3>
+
+@if (Model.VehicleModels.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nazwa Modelu</th>
+                <th>Marka</th>
+                <th>Typ</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vehicleModel in Model.VehicleModels)
+            {
+                <tr>
+                    <td>@vehicleModel.Name</td>
+                    <td>@vehicleModel.BrandName</td>
+                    <td>@vehicleModel.VehicleTypeName</td>
+                    <td>
+                        <form asp-action="DeleteVehicleModel" asp-route-id="@vehicleModel.Id" method="post"
+                              style="display:inline;"
+                              onsubmit="return confirm('Czy na pewno chcesz usunąć ten model?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Usuń</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Brak dostępnych modeli.</p>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

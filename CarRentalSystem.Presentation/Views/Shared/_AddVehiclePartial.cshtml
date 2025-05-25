@@ -1,0 +1,45 @@
+﻿@model CreateVehicleViewModel
+
+<form asp-action="CreateVehicle" asp-controller="Admin" method="post" class="row g-3 mb-4">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="col-md-4">
+        <label asp-for="VehicleTypeId" class="form-label">Typ</label>
+        <select asp-for="VehicleTypeId" class="form-select" id="vehicleType">
+            <option value="">-- Select Type --</option>
+            @foreach (var type in Model.AvailableTypes)
+            {
+                 <option value="@type.Value">@type.Text</option>
+            }
+        </select>
+        <span asp-validation-for="VehicleTypeId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="VehicleBrandId" class="form-label">Marka</label>
+        <select asp-for="VehicleBrandId" class="form-select" id="vehicleBrand">
+            <option value="">-- Select Brand --</option>
+        </select>
+        <span asp-validation-for="VehicleBrandId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="VehicleModelId" class="form-label">Model</label>
+        <select asp-for="VehicleModelId" class="form-select" id="vehicleModel">
+            <option value="">-- Select Model --</option>
+        </select>
+        <span asp-validation-for="VehicleModelId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-4">
+        <label asp-for="DailyRate" class="form-label">Dzienna stawka wynajmu</label>
+        <input asp-for="DailyRate" class="form-control" />
+        <span asp-validation-for="DailyRate" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <button class="btn btn-primary" type="submit">Dodaj Pojazd</button>
+    </div>
+</form>

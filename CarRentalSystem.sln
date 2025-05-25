@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRentalSystem.Presentation", "CarRentalSystem.Presentation\CarRentalSystem.Presentation.csproj", "{F4B7DBA4-76E1-4E93-954B-BBA1B6D6C174}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarRentalSystem.Presentation", "CarRentalSystem.Presentation\CarRentalSystem.Presentation.csproj", "{F4B7DBA4-76E1-4E93-954B-BBA1B6D6C174}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRentalSystem.DataAccess", "CarRentalSystem.DataAccess\CarRentalSystem.DataAccess.csproj", "{59C19880-B343-4FB4-9F21-383DFE1D2FCD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarRentalSystem.DataAccess", "CarRentalSystem.DataAccess\CarRentalSystem.DataAccess.csproj", "{59C19880-B343-4FB4-9F21-383DFE1D2FCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarRentalSystem.BusinessLogic", "CarRentalSystem.BussinesLogic\CarRentalSystem.BusinessLogic.csproj", "{A7D49BFC-49DA-4879-87D2-C9DF280A097C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarRentalSystem.BusinessLogic", "CarRentalSystem.BussinesLogic\CarRentalSystem.BusinessLogic.csproj", "{A7D49BFC-49DA-4879-87D2-C9DF280A097C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

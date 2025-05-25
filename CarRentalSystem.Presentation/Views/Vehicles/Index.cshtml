@@ -1,0 +1,45 @@
+﻿@model List<VehicleViewModel>
+
+<h2>Dostępne Pojazdy</h2>
+
+@if (!Model.Any())
+{
+    <p>Brak dostępnych pojazdów.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Type</th>
+                <th>Daily Rate</th>
+@*                 <th>Availability</th> *@
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vehicle in Model)
+            {
+                <tr>
+                    <td>@vehicle.BrandName</td>
+                    <td>@vehicle.ModelName</td>
+                    <td>@vehicle.TypeName</td>
+                    <td>@vehicle.DailyRate.ToString("C")</td>
+@*                     <td>@(vehicle.IsAvailable ? "Available" : "Not Available")</td> *@
+                    <td>
+                        @if (vehicle.IsAvailable)
+                        {
+                            <a asp-controller="Reservations" asp-action="CreateReservation" asp-route-vehicleId="@vehicle.Id" class="btn btn-primary btn-sm">Zarezerwuj</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Niedostępny</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
