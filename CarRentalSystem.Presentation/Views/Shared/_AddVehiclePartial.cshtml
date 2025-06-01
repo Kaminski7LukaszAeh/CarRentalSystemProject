@@ -8,7 +8,7 @@
     <div class="col-md-4">
         <label asp-for="VehicleTypeId" class="form-label">Typ</label>
         <select asp-for="VehicleTypeId" class="form-select" id="vehicleType">
-            <option value="">-- Select Type --</option>
+            <option value="">-- Wybierz Typ --</option>
             @foreach (var type in Model.AvailableTypes)
             {
                  <option value="@type.Value">@type.Text</option>
@@ -20,7 +20,7 @@
     <div class="col-md-4">
         <label asp-for="VehicleBrandId" class="form-label">Marka</label>
         <select asp-for="VehicleBrandId" class="form-select" id="vehicleBrand">
-            <option value="">-- Select Brand --</option>
+            <option value="">-- Wybierz Marke --</option>
         </select>
         <span asp-validation-for="VehicleBrandId" class="text-danger"></span>
     </div>
@@ -28,7 +28,7 @@
     <div class="col-md-4">
         <label asp-for="VehicleModelId" class="form-label">Model</label>
         <select asp-for="VehicleModelId" class="form-select" id="vehicleModel">
-            <option value="">-- Select Model --</option>
+            <option value="">-- Wybierz Model --</option>
         </select>
         <span asp-validation-for="VehicleModelId" class="text-danger"></span>
     </div>

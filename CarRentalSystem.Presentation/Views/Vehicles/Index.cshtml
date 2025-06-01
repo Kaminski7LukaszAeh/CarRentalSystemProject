@@ -1,6 +1,76 @@
 ﻿@model List<VehicleViewModel>
+@using CarRentalSystem.BusinessLogic.DataTransferObjects
+@using CarRentalSystem.Presentation.Models
 
+@{
+    var filter = ViewData["Filter"] as VehicleFilter ?? new VehicleFilter();
+    var combinedRange = filter.StartDate.HasValue && filter.EndDate.HasValue
+        ? $"{filter.StartDate.Value:yyyy-MM-dd} to {filter.EndDate.Value:yyyy-MM-dd}"
+        : "";
+    var startTime = filter.StartDate?.ToString("HH:mm") ?? "00:00";
+    var endTime = filter.EndDate?.ToString("HH:mm") ?? "00:00";
+    var minPrice = filter.MinPrice ?? 0;
+    var maxPrice = filter.MaxPrice ?? 2000;
+}
 <h2>Dostępne Pojazdy</h2>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <form id="filterForm" method="get" class="mb-4 row g-3 align-items-center">
+                <div class="col-12">
+                    <label for="DateRange">Data odbioru i zwrotu</label>
+                    <input type="text" class="form-control" id="DateRange" placeholder="Wybierz zakres dat" />
+                </div>
+
+                <div class="col-12 d-flex gap-3">
+                    <div class="flex-grow-1">
+                        <label for="StartTime">Godzina odbioru</label>
+                        <select class="form-control" id="StartTime"></select>
+                    </div>
+                    <div class="flex-grow-1">
+                        <label for="EndTime">Godzina zwrotu</label>
+                        <select class="form-control" id="EndTime"></select>
+                    </div>
+                </div>
+
+                <input type="hidden" id="StartDate" name="StartDate" value="@filter.StartDate?.ToString("yyyy-MM-ddTHH:mm")" />
+                <input type="hidden" id="EndDate" name="EndDate" value="@filter.EndDate?.ToString("yyyy-MM-ddTHH:mm")" />
+
+                <div class="col-12">
+                    <label>Zakres cen:</label>
+                    <div id="priceSlider" class="mb-2"></div>
+                    <div class="d-flex justify-content-between">
+                        <span id="minPriceDisplay">@minPrice zł</span>
+                        <span id="maxPriceDisplay">@maxPrice zł</span>
+                    </div>
+                    <input type="hidden" name="MinPrice" id="MinPrice" value="@minPrice" />
+                    <input type="hidden" name="MaxPrice" id="MaxPrice" value="@maxPrice" />
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Typy pojazdów:</label><br />
+                    @{
+                        var vehicleTypes = ViewData["VehicleTypes"] as List<VehicleTypeDto>;
+                    }
+                    @foreach (var type in vehicleTypes)
+                    {
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="SelectedVehicleTypeIds" value="@type.Id"
+                            @(filter.SelectedVehicleTypeIds.Contains(type.Id) ? "checked" : "") />
+                            <label class="form-check-label">@type.TypeName</label>
+                        </div>
+                    }
+                </div>
+
+                <div class="col-auto mt-4">
+                    <button type="submit" class="btn btn-primary">Filtruj</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary ms-2">Resetuj</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 @if (!Model.Any())
 {
@@ -8,38 +78,114 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Brand</th>
-                <th>Model</th>
-                <th>Type</th>
-                <th>Daily Rate</th>
-@*                 <th>Availability</th> *@
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var vehicle in Model)
-            {
-                <tr>
-                    <td>@vehicle.BrandName</td>
-                    <td>@vehicle.ModelName</td>
-                    <td>@vehicle.TypeName</td>
-                    <td>@vehicle.DailyRate.ToString("C")</td>
-@*                     <td>@(vehicle.IsAvailable ? "Available" : "Not Available")</td> *@
-                    <td>
-                        @if (vehicle.IsAvailable)
-                        {
-                            <a asp-controller="Reservations" asp-action="CreateReservation" asp-route-vehicleId="@vehicle.Id" class="btn btn-primary btn-sm">Zarezerwuj</a>
-                        }
-                        else
-                        {
-                            <span class="text-muted">Niedostępny</span>
-                        }
-                    </td>
-                </tr>
+    <div class="d-flex flex-wrap gap-3">
+        @foreach (var vehicle in Model)
+        {
+            @await Html.PartialAsync("_VehicleCardPartial", vehicle)
+        }
+    </div>
+}
+
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" rel="stylesheet" />
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
+
+    <script>
+        function populateTimeDropdown(id, selectedValue = "") {
+            const select = document.getElementById(id);
+            select.innerHTML = "";
+            for (let hour = 0; hour < 24; hour++) {
+                for (let min = 0; min < 60; min += 30) {
+                    const h = hour.toString().padStart(2, '0');
+                    const m = min.toString().padStart(2, '0');
+                    const value = `${h}:${m}`;
+                    const option = document.createElement("option");
+                    option.value = value;
+                    option.textContent = value;
+                    if (value === selectedValue) option.selected = true;
+                    select.appendChild(option);
+                }
             }
-        </tbody>
-    </table>
+        }
+
+        function formatDateLocal(date, time) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}T${time}`;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("filterForm");
+
+            flatpickr("#DateRange", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                defaultDate: "@combinedRange",
+                onChange: updateDateTimeFields
+            });
+
+            populateTimeDropdown("StartTime", "@startTime");
+            populateTimeDropdown("EndTime", "@endTime");
+
+            document.getElementById("StartTime").addEventListener("change", updateDateTimeFields);
+            document.getElementById("EndTime").addEventListener("change", updateDateTimeFields);
+
+            function updateDateTimeFields() {
+                const picker = document.getElementById("DateRange")._flatpickr;
+                const dates = picker.selectedDates;
+
+                if (dates.length === 2) {
+                    const startTime = document.getElementById("StartTime").value;
+                    const endTime = document.getElementById("EndTime").value;
+
+                    const startDate = formatDateLocal(dates[0], startTime);
+                    const endDate = formatDateLocal(dates[1], endTime);
+
+                    document.getElementById("StartDate").value = startDate;
+                    document.getElementById("EndDate").value = endDate;
+
+                    form.submit();
+                }
+            }
+
+            const priceSlider = document.getElementById('priceSlider');
+            const minPriceDisplay = document.getElementById('minPriceDisplay');
+            const maxPriceDisplay = document.getElementById('maxPriceDisplay');
+            const minPriceInput = document.getElementById('MinPrice');
+            const maxPriceInput = document.getElementById('MaxPrice');
+
+            noUiSlider.create(priceSlider, {
+                start: [@minPrice, @maxPrice],
+                connect: true,
+                step: 10,
+                range: {
+                    'min': 0,
+                    'max': 2000
+                },
+                format: {
+                    to: value => Math.round(value),
+                    from: value => parseInt(value)
+                }
+            });
+
+            priceSlider.noUiSlider.on('change', function (values) {
+                minPriceDisplay.textContent = values[0] + " zł";
+                maxPriceDisplay.textContent = values[1] + " zł";
+                minPriceInput.value = values[0];
+                maxPriceInput.value = values[1];
+                form.submit();
+            });
+
+            document.querySelectorAll('input[name="SelectedVehicleTypeIds"]').forEach(cb => {
+                cb.addEventListener('change', () => {
+                    form.submit();
+                });
+            });
+        });
+    </script>
 }

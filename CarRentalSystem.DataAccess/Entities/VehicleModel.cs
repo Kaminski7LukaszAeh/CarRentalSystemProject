@@ -8,5 +8,7 @@
         public VehicleBrand Brand { get; set; }
         public int VehicleTypeId { get; set; }
         public VehicleType VehicleType { get; set; }
+
+        public ICollection<Vehicle> Vehicles { get; set; } = [];
     }
 }

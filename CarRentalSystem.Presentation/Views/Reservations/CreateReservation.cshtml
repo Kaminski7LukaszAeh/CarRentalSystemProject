@@ -1,126 +1,16 @@
 ﻿@model CreateReservationViewModel
+
 <div class="mb-3">
     <button class="btn btn-secondary" onclick="history.back()">← Powrót</button>
 </div>
+
 <h2>Zarezerwuj pojazd</h2>
+
 @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger">
         @TempData["Error"]
     </div>
 }
-<form asp-action="CreateReservation" method="post">
-    <input type="hidden" asp-for="VehicleId" />
-    <input type="hidden" asp-for="TotalCost" id="totalCostHidden" />
 
-    <div class="form-group">
-        <label asp-for="StartDate"></label>
-        <input asp-for="StartDate" class="form-control" id="startDate" />
-        <span asp-validation-for="StartDate" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="EndDate"></label>
-        <input asp-for="EndDate" class="form-control" id="endDate" />
-        <span asp-validation-for="EndDate" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label>Total Cost</label>
-        <p id="totalCostDisplay" class="form-control-plaintext">@Model.TotalCost.ToString("F2")</p>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Rezerwuj</button>
-    <a asp-controller="Vehicles" asp-action="Index" class="btn btn-secondary">Cofnij</a>
-</form>
-
-<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
-    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-    <script>
-        const dailyRate = @Model.DailyRate;
-        const vehicleId = @Model.VehicleId;
-
-        const totalCostHiddenInput = document.getElementById("totalCostHidden");
-        const totalCostDisplay = document.getElementById("totalCostDisplay");
-
-        let reservedDates = [];
-
-        async function fetchReservedDates() {
-            try {
-                const response = await fetch(`/Reservations/GetReservedDates?vehicleId=${vehicleId}`);
-                if (response.ok) {
-                    reservedDates = await response.json();
-                    initializeFlatpickrs();
-                } else {
-                    console.error("Failed to load reserved dates");
-                    initializeFlatpickrs(); 
-                }
-            } catch (error) {
-                console.error("Error fetching reserved dates:", error);
-                initializeFlatpickrs();
-            }
-        }
-
-        function initializeFlatpickrs() {
-            const disabledDates = reservedDates.map(d => new Date(d));
-
-            flatpickr("#startDate", {
-                dateFormat: "Y-m-d",
-                disable: disabledDates,
-                onChange: function (selectedDates, dateStr, instance) {
-                    calculateTotalCost();
-                    if (selectedDates.length > 0) {
-                        const minEndDate = new Date(selectedDates[0]);
-                        minEndDate.setDate(minEndDate.getDate() + 1);
-                        endDatePicker.set('minDate', minEndDate);
-                        if (endDatePicker.selectedDates.length > 0 && endDatePicker.selectedDates[0] < minEndDate) {
-                            endDatePicker.clear();
-                        }
-                    }
-                },
-                minDate: "today"
-            });
-
-            endDatePicker = flatpickr("#endDate", {
-                dateFormat: "Y-m-d",
-                disable: disabledDates,
-                onChange: function (selectedDates, dateStr, instance) {
-                    calculateTotalCost();
-                },
-                minDate: new Date().fp_incr(1)
-            });
-        }
-
-        function calculateTotalCost() {
-            const startVal = document.getElementById("startDate").value;
-            const endVal = document.getElementById("endDate").value;
-            const start = new Date(startVal);
-            const end = new Date(endVal);
-
-            if (!isNaN(start) && !isNaN(end) && end > start) {
-                const diffTime = end - start;
-                const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                const totalCost = days * dailyRate;
-                totalCostHiddenInput.value = totalCost.toFixed(2);
-                totalCostDisplay.textContent = totalCost.toFixed(2);
-            } else {
-                totalCostHiddenInput.value = "0.00";
-                totalCostDisplay.textContent = "0.00";
-            }
-        }
-
-        window.addEventListener("load", () => {
-            fetchReservedDates();
-        });
-    </script>
-}
-
-
+@await Component.InvokeAsync("ReservationCalendar", new { vehicleId = Model.VehicleId, dailyRate = Model.DailyRate })

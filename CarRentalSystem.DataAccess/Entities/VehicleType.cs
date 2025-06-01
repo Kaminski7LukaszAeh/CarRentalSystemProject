@@ -5,6 +5,6 @@
         public int Id { get; set; }
         public string TypeName { get; set; }
 
-        public ICollection<Vehicle> Vehicles { get; set; } = [];
+        public ICollection<VehicleModel> VehicleModels { get; set; } = [];
     }
 }

@@ -1,0 +1,36 @@
+﻿@model PaymentViewModel
+
+@{
+    ViewData["Title"] = "Szczegóły płatności";
+}
+
+<h2 class="mt-4">Szczegóły płatności</h2>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-4">Numer rezerwacji</dt>
+            <dd class="col-sm-8">@Model.ReservationId</dd>
+
+            <dt class="col-sm-4">Kwota</dt>
+            <dd class="col-sm-8">@Model.Amount.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pl-PL"))</dd>
+
+            @if (Model.PaymentDate.HasValue && Model.PaymentDate.Value > DateTime.MinValue)
+            {
+                <dt class="col-sm-4">Data płatności</dt>
+                <dd class="col-sm-8">@Model.PaymentDate.Value.ToString("g")</dd>
+            }
+
+            <dt class="col-sm-4">Status</dt>
+            <dd class="col-sm-8">@Model.Status</dd>
+
+            <dt class="col-sm-4">Numer potwierdzenia</dt>
+            <dd class="col-sm-8">@Model.PaymentConfirmationNumber</dd>
+        </dl>
+
+        @if (Model.Status != CarRentalSystem.DataAccess.Entities.Enums.PaymentStatus.Completed)
+        {
+            <a asp-action="Payment" asp-route-reservationId="@Model.ReservationId" class="btn btn-primary">Opłać</a>
+        }
+    </div>
+</div>

@@ -13,7 +13,7 @@
     <div class="col-md-6">
         <label asp-for="BrandId" class="form-label">Marka:</label>
         <select asp-for="BrandId" asp-items="Model.AvailableBrands" class="form-select">
-            <option value="">-- Select Brand --</option>
+            <option value="">-- Wybierz Marke --</option>
         </select>
         <span asp-validation-for="BrandId" class="text-danger"></span>
     </div>
@@ -21,7 +21,7 @@
     <div class="col-md-6">
         <label asp-for="VehicleTypeId" class="form-label">Typ:</label>
         <select asp-for="VehicleTypeId" asp-items="Model.AvailableVehicleTypes" class="form-select">
-            <option value="">-- Select Vehicle Type --</option>
+            <option value="">-- Wybierz Typ --</option>
         </select>
         <span asp-validation-for="VehicleTypeId" class="text-danger"></span>
     </div>

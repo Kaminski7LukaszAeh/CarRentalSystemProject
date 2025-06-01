@@ -1,4 +1,5 @@
 ﻿using CarRentalSystem.DataAccess.Entities;
+using CarRentalSystem.DataAccess.Filters;
 
 namespace CarRentalSystem.DataAccess.Interfaces
 {
@@ -6,14 +7,15 @@ namespace CarRentalSystem.DataAccess.Interfaces
     {
         //Vehicle
         Task<IEnumerable<Vehicle>> GetAllVehiclesAsync();
-        Task<Vehicle?> GetVehicleByIdAsync(int id);
+        Task<IEnumerable<Vehicle>> GetFilteredVehiclesAsync(VehicleFilterDal filter);
+        Task<Vehicle> GetVehicleByIdAsync(int id);
         Task AddVehicleAsync(Vehicle vehicle);
         Task UpdateVehicleAsync(Vehicle vehicle);
         Task DeleteVehicleAsync(Vehicle vehicle);
 
         //Vehicle Type
         Task<IEnumerable<VehicleType>> GetAllTypesAsync();
-        Task <VehicleType> GetByIdAsync(int id);
+        Task <VehicleType> GetTypeByIdAsync(int id);
         Task AddVehicleTypeAsync (VehicleType type);
         Task DeleteVehicleTypeAsync(VehicleType type);
         Task<bool> TypeExistsAsync(string typeName);

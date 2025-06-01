@@ -1,7 +1,7 @@
 ﻿@model RegisterViewModel
 
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Rejestracja";
 }
 
 <h2>@ViewData["Title"]</h2>
@@ -25,11 +25,11 @@
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Register</button>
+    <button type="submit" class="btn btn-primary">Zarejestruj się</button>
 </form>
 
 <div>
-    Already have an account? <a asp-controller="Account" asp-action="Login">Log in</a>
+    Posiadasz już konto? <a asp-controller="Account" asp-action="Login">Logowanie</a>
 </div>
 
 @section Scripts {

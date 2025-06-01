@@ -1,0 +1,47 @@
+﻿@model List<ReservationViewModel>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+@{
+    ViewData["Title"] = "Historia Rezerwacji";
+}
+
+<h2>Historia Rezerwacji</h2>
+
+@if (!Model.Any())
+{
+    <p>Brak zakończonych lub anulowanych rezerwacji.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Pojazd</th>
+                <th>Data wypożyczenia</th>
+                <th>Data zwrotu</th>
+                <th>Data rezerwacji</th>
+                <th>Całkowity koszt</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var reservation in Model)
+            {
+                <tr>
+                    <td>@reservation.BrandName @reservation.ModelName (@reservation.VehicleTypeName)</td>
+                    <td>@reservation.StartDate.ToShortDateString() (@reservation.StartDate.ToShortTimeString())</td>
+                    <td>@reservation.EndDate.ToShortDateString() (@reservation.EndDate.ToShortTimeString())</td>
+                    <td>@reservation.CreatedAt.ToShortDateString() (@reservation.CreatedAt.ToShortTimeString())</td>
+                    <td>@reservation.TotalCost.ToString("C")</td>
+                    <td>@reservation.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,6 +1,4 @@
 ﻿using CarRentalSystem.BusinessLogic.Interfaces;
-using CarRentalSystem.BusinessLogic.Mapping;
-using CarRentalSystem.DataAccess.Interfaces;
 using CarRentalSystem.Presentation.Mapping;
 using CarRentalSystem.Presentation.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -13,19 +11,19 @@ namespace CarRentalSystem.Presentation.Controllers
     public class ReservationsController : Controller
     {
         private readonly IReservationService _reservationService;
-        private readonly IVehicleRepository _vehicleRepository;
+        private readonly IVehicleService _vehicleService;
 
-        public ReservationsController(IReservationService reservationService, IVehicleRepository vehicleRepository)
+        public ReservationsController(IReservationService reservationService, IVehicleService VehicleService)
         {
             _reservationService = reservationService;
-            _vehicleRepository = vehicleRepository;
+            _vehicleService = VehicleService;
         }
 
         [HttpGet]
         public async Task<IActionResult> CreateReservation(int vehicleId)
         {
-            var vehicle = await _vehicleRepository.GetVehicleByIdAsync(vehicleId);
-            if (vehicle == null)
+            var vehicleDto = await _vehicleService.GetVehicleByIdAsync(vehicleId);
+            if (vehicleDto == null)
             {
                 return NotFound();
             }
@@ -38,54 +36,55 @@ namespace CarRentalSystem.Presentation.Controllers
                 VehicleId = vehicleId,
                 StartDate = startDate,
                 EndDate = endDate,
-                DailyRate = vehicle.DailyRate,
-                TotalCost = _reservationService.CalculateTotalCost(startDate, endDate, vehicle.DailyRate)
+                DailyRate = vehicleDto.Value.DailyRate,
+                TotalCost = _reservationService.CalculateTotalCost(startDate, endDate, vehicleDto.Value.DailyRate)
             };
 
             return View(model);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateReservation(CreateReservationViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                var vehicle = await _vehicleRepository.GetVehicleByIdAsync(model.VehicleId);
+                var vehicle = await _vehicleService.GetVehicleByIdAsync(model.VehicleId);
                 if (vehicle == null)
                 {
                     return NotFound();
                 }
-                model.DailyRate = vehicle.DailyRate;
-
+                model.DailyRate = vehicle.Value.DailyRate;
                 return View(model);
             }
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
             var dto = ViewModelToDtoMapper.Map(model, userId);
+
             var result = await _reservationService.CreateReservationAsync(dto);
 
-            if (result.IsSuccess)
+            if (!result.IsSuccess)
             {
-                TempData["Success"] = "Reservation created successfully.";
-                return RedirectToAction("MyReservations", "Reservations");
-            }
-            else
-            {
-                var vehicle = await _vehicleRepository.GetVehicleByIdAsync(model.VehicleId);
+                var vehicle = await _vehicleService.GetVehicleByIdAsync(model.VehicleId);
                 if (vehicle == null)
                 {
                     return NotFound();
                 }
-                model.DailyRate = vehicle.DailyRate;
-
+                model.DailyRate = vehicle.Value.DailyRate;
                 TempData["Error"] = result.Error ?? "Failed to create reservation.";
                 return View(model);
+            }
+
+            var reservationId = result.Value.Id;
+
+            if (model.PayNow)
+            {
+                return RedirectToAction("Payment", "Payments", new { reservationId });
+            }
+            else
+            {
+                TempData["Success"] = "Rezerwacja została utworzona. Możesz zapłacić później.";
+                return RedirectToAction("MyReservations", "Reservations");
             }
         }
 
@@ -94,7 +93,7 @@ namespace CarRentalSystem.Presentation.Controllers
         public async Task<IActionResult> MyReservations()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var result = await _reservationService.GetReservationsByUserAsync(userId);
+            var result = await _reservationService.GetActiveReservationsByUserAsync(userId);
 
             if (!result.IsSuccess)
             {
@@ -107,23 +106,54 @@ namespace CarRentalSystem.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetReservedDates(int vehicleId)
+        public async Task<IActionResult> ReservationHistory()
         {
-            var result = await _reservationService.GetReservationsByVehicleAsync(vehicleId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = await _reservationService.GetHistoricalReservations(userId);
 
             if (!result.IsSuccess)
             {
-                return BadRequest(result.Error);
+                TempData["Error"] = result.Error;
+                return View(new List<ReservationViewModel>());
             }
 
-            var reservedDates = result.Value
-                .SelectMany(r => Enumerable.Range(0, (r.EndDate.Date - r.StartDate.Date).Days + 1)
-                .Select(d => r.StartDate.Date.AddDays(d).ToString("yyyy-MM-dd")))
-                .Distinct()
-                .ToList();
-
-            return Json(reservedDates);
+            var viewModels = DtoToViewModelMapper.MapList(result.Value);
+            return View(viewModels);
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelReservation(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = await _reservationService.CancelReservationAsync(id, userId);
+
+            if (!result.IsSuccess)
+            {
+                TempData["Error"] = result.Error;
+            }
+            else
+            {
+                TempData["Success"] = "Rezerwacja została anulowana.";
+            }
+
+            return RedirectToAction("MyReservations");
+        }
+
+
+        //[HttpGet]
+        //public async Task<IActionResult> GetReservedDates(int vehicleId)
+        //{
+        //    var result = await _reservationService.GetReservedDatesAsync(vehicleId);
+
+        //    if (!result.IsSuccess)
+        //    {
+        //        return BadRequest(result.Error);
+        //    }
+
+        //    return Json(result.Value);
+        //}
 
 
     }

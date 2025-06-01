@@ -25,7 +25,7 @@ namespace CarRentalSystem.DataAccess
 
             modelBuilder.Entity<Vehicle>()
                 .HasOne(v => v.VehicleModel)
-                .WithMany()
+                .WithMany(vm => vm.Vehicles)
                 .HasForeignKey(v => v.VehicleModelId);
 
             modelBuilder.Entity<VehicleModel>()
@@ -33,9 +33,10 @@ namespace CarRentalSystem.DataAccess
                 .WithMany(b => b.Models)
                 .HasForeignKey(vm => vm.BrandId);
 
+
             modelBuilder.Entity<VehicleModel>()
                 .HasOne(vm => vm.VehicleType)
-                .WithMany()
+                .WithMany(vt => vt.VehicleModels)
                 .HasForeignKey(vm => vm.VehicleTypeId);
 
             modelBuilder.Entity<Reservation>()

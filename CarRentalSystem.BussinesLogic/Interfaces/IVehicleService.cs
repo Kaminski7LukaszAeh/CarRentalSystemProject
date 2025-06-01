@@ -12,6 +12,8 @@ namespace CarRentalSystem.BusinessLogic.Interfaces
         Task<Result> DeleteVehicleModelAsync(int id);
 
         Task<Result<IEnumerable<VehicleDto>>> GetAllVehiclesAsync();
+        Task<Result<IEnumerable<VehicleDto>>> GetFilteredVehiclesAsync(VehicleFilterDto filter);
+        Task<Result<VehicleDto>> GetVehicleByIdAsync(int vehicleId);
         Task<Result> AddVehicleAsync(CreateVehicleDto dto);
         Task<Result> DeleteVehicleAsync(int id);
 

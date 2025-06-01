@@ -1,18 +1,18 @@
 ﻿@{
-    ViewData["Title"] = "Manage Account";
+    ViewData["Title"] = "Zarządzaj Kontem";
 }
 
 <h2>@ViewData["Title"]</h2>
 
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Delete Account</h5>
+        <h5 class="card-title">Usuń Konto</h5>
         <p class="card-text text-danger">
-            Warning: This action is irreversible. Deleting your account will remove all associated data.
+            Ostrzeżenie: ta czynność jest nieodwracalna. Usunięcie konta spowoduje utratę wszystkich powiązanych danych.
         </p>
         <form asp-action="DeleteAccount" method="post">
             <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
-                Delete My Account
+                Usuń konto
             </button>
         </form>
     </div>

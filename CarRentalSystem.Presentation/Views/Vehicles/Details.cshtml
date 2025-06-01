@@ -1,0 +1,29 @@
+﻿@model VehicleViewModel
+
+<div class="mb-3">
+    <button class="btn btn-secondary" onclick="history.back()">← Powrót</button>
+</div>
+
+<div class="container mt-4">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="row g-0 align-items-center">
+            <div class="col-md-6 text-center">
+                <img src="https://media.istockphoto.com/id/933297444/pl/zdj%C4%99cie/clay-model-renderowania-elektryczny-suv-samoch%C3%B3d-koncepcyjny.jpg?s=1024x1024&w=is&k=20&c=hO34Eo8g2m9Wjh7CMNmcCtBWBVMzx5yjf9hnKW0-G1o="
+                     class="img-fluid rounded-start p-3" alt="Car image" style="max-height: 400px;" />
+            </div>
+
+            <div class="col-md-6">
+                <div class="card-body">
+                    <h1 class="card-title display-5 fw-bold mb-3">@Model.BrandName @Model.ModelName</h1>
+                    <h4 class="card-subtitle text-muted mb-2">Typ: @Model.TypeName</h4>
+
+                    <p class="fs-4 text-primary mt-3 mb-4">@Model.DailyRate.ToString("C") / dzień</p>
+
+                    <div class="mb-4">
+                        @await Component.InvokeAsync("ReservationCalendar", new { vehicleId = Model.Id, dailyRate = Model.DailyRate })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

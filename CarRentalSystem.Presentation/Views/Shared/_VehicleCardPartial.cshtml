@@ -1,0 +1,13 @@
+﻿@model VehicleViewModel
+
+<div class="card vehicle-card" style="width: 18rem; margin: 10px;">
+    <img src="https://media.istockphoto.com/id/933297444/pl/zdj%C4%99cie/clay-model-renderowania-elektryczny-suv-samoch%C3%B3d-koncepcyjny.jpg?s=1024x1024&w=is&k=20&c=hO34Eo8g2m9Wjh7CMNmcCtBWBVMzx5yjf9hnKW0-G1o=" class="card-img-top" alt="Car image" />
+    <div class="card-body">
+        <h5 class="card-title">@Model.BrandName @Model.ModelName</h5>
+        <p class="card-text">
+            Typ: @Model.TypeName <br />
+            Cena za dzień: @Model.DailyRate.ToString("C")
+        </p>
+        <a asp-controller="Vehicles" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-primary btn-sm mt-2">Szczegóły</a>
+    </div>
+</div>

@@ -1,8 +1,114 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
-}
+    var startDate = Context.Request.Query["StartDate"].ToString();
+    var endDate = Context.Request.Query["EndDate"].ToString();
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    var startDatePart = "";
+    var endDatePart = "";
+    var startTimePart = "";
+    var endTimePart = "";
+
+    if (DateTime.TryParse(startDate, out var parsedStart))
+    {
+        startDatePart = parsedStart.ToString("yyyy-MM-dd");
+        startTimePart = parsedStart.ToString("HH:mm");
+    }
+
+    if (DateTime.TryParse(endDate, out var parsedEnd))
+    {
+        endDatePart = parsedEnd.ToString("yyyy-MM-dd");
+        endTimePart = parsedEnd.ToString("HH:mm");
+    }
+}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-12">
+            <div class="card shadow p-4">
+                <h4 class="mb-4 text-center">Wyszukaj dostępne pojazdy</h4>
+
+                <div class="mb-3">
+                    <label for="DateRange">Data odbioru i zwrotu</label>
+                    <input type="text" id="DateRange" class="form-control" placeholder="Wybierz zakres dat" />
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col">
+                        <label for="StartTime">Godzina odbioru</label>
+                        <select class="form-control" id="StartTime"></select>
+                    </div>
+                    <div class="col">
+                        <label for="EndTime">Godzina zwrotu</label>
+                        <select class="form-control" id="EndTime"></select>
+                    </div>
+                </div>
+
+                <input type="hidden" id="StartDate" value="@startDatePart" />
+                <input type="hidden" id="EndDate" value="@endDatePart" />
+
+                <div class="d-grid">
+                    <button class="btn btn-primary" id="searchBtn">Szukaj</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        function populateTimeDropdown(id, selectedValue = "") {
+            const select = document.getElementById(id);
+            select.innerHTML = "";
+            for (let hour = 0; hour < 24; hour++) {
+                for (let min = 0; min < 60; min += 30) {
+                    const h = hour.toString().padStart(2, '0');
+                    const m = min.toString().padStart(2, '0');
+                    const value = `${h}:${m}`;
+                    const option = document.createElement("option");
+                    option.value = value;
+                    option.textContent = value;
+                    if (value === selectedValue) option.selected = true;
+                    select.appendChild(option);
+                }
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            flatpickr("#DateRange", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                defaultDate: ["@startDatePart", "@endDatePart"],
+                onChange: function (selectedDates) {
+                    if (selectedDates.length === 2) {
+                        function formatDateLocal(date) {
+                            const year = date.getFullYear();
+                            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                            const day = date.getDate().toString().padStart(2, '0');
+                            return `${year}-${month}-${day}`;
+                        }
+                        document.getElementById("StartDate").value = formatDateLocal(selectedDates[0]);
+                        document.getElementById("EndDate").value = formatDateLocal(selectedDates[1]);
+                    }
+                }
+            });
+
+            populateTimeDropdown("StartTime", "@startTimePart");
+            populateTimeDropdown("EndTime", "@endTimePart");
+
+            document.getElementById("searchBtn").addEventListener("click", function () {
+                const startDate = document.getElementById("StartDate").value;
+                const endDate = document.getElementById("EndDate").value;
+                const startTime = document.getElementById("StartTime").value;
+                const endTime = document.getElementById("EndTime").value;
+
+                if (startDate && endDate && startTime && endTime) {
+                    const start = `${startDate}T${startTime}`;
+                    const end = `${endDate}T${endTime}`;
+                    window.location.href = `/Vehicles?StartDate=${start}&EndDate=${end}`;
+                } else {
+                    alert("Wypełnij wszystkie pola.");
+                }
+            });
+        });
+    </script>
+}

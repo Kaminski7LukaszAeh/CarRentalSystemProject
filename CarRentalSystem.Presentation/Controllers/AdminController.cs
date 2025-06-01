@@ -1,5 +1,4 @@
-﻿using CarRentalSystem.BusinessLogic.Common;
-using CarRentalSystem.BusinessLogic.Interfaces;
+﻿using CarRentalSystem.BusinessLogic.Interfaces;
 using CarRentalSystem.Presentation.Mapping;
 using CarRentalSystem.Presentation.Models;
 using Microsoft.AspNetCore.Authorization;

@@ -1,6 +1,7 @@
 ﻿using CarRentalSystem.BusinessLogic.DataTransferObjects;
 using CarRentalSystem.DataAccess.Entities;
 using CarRentalSystem.DataAccess.Entities.Enums;
+using CarRentalSystem.DataAccess.Filters;
 
 namespace CarRentalSystem.BusinessLogic.Mapping
 {
@@ -67,9 +68,38 @@ namespace CarRentalSystem.BusinessLogic.Mapping
                 UserId = dto.UserId,
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow.AddHours(2),
                 Status = ReservationStatus.Active,
                 TotalCost = dto.TotalCost,
+                Payment = new Payment
+                {
+                    Amount = dto.TotalCost,
+                    Status = PaymentStatus.Pending,
+                    PaymentConfirmationNumber = Guid.NewGuid().ToString(),
+                }
+            };
+        }
+        public static VehicleFilterDal Map(VehicleFilterDto dto)
+        {
+            return new VehicleFilterDal
+            {
+                StartDate = dto.StartDate,
+                EndDate = dto.EndDate,
+                MinPrice = dto.MinPrice,
+                MaxPrice = dto.MaxPrice,
+                SelectedVehicleTypeIds = dto.SelectedVehicleTypeIds
+            };
+        }
+        public static Payment Map(PaymentDto dto)
+        {
+            return new Payment
+            {
+                Id = dto.Id,
+                ReservationId = dto.ReservationId,
+                Amount = dto.Amount,
+                PaymentDate = dto.PaymentDate,
+                Status = dto.Status,
+                PaymentConfirmationNumber = dto.PaymentConfirmationNumber
             };
         }
     }
@@ -153,7 +183,21 @@ namespace CarRentalSystem.BusinessLogic.Mapping
                 DailyRate = entity.Vehicle?.DailyRate ?? 0,
                 BrandName = entity.Vehicle?.VehicleModel?.Brand?.Name ?? "Unknown",
                 ModelName = entity.Vehicle?.VehicleModel?.Name ?? "Unknown",
-                VehicleTypeName = entity.Vehicle?.VehicleModel?.VehicleType?.TypeName ?? "Unknown"
+                VehicleTypeName = entity.Vehicle?.VehicleModel?.VehicleType?.TypeName ?? "Unknown",
+                Status = entity.Status
+            };
+        }
+
+        public static PaymentDto Map(Payment entity)
+        {
+            return new PaymentDto
+            {
+                Id = entity.Id,
+                ReservationId = entity.ReservationId,
+                Amount = entity.Amount,
+                PaymentDate = entity.PaymentDate,
+                Status = entity.Status,
+                PaymentConfirmationNumber = entity.PaymentConfirmationNumber
             };
         }
 

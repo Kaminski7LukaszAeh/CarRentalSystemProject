@@ -1,4 +1,6 @@
 ﻿using CarRentalSystem.DataAccess.Entities;
+using CarRentalSystem.DataAccess.Entities.Enums;
+using CarRentalSystem.DataAccess.Filters;
 using CarRentalSystem.DataAccess.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,9 +20,11 @@ namespace CarRentalSystem.DataAccess.Repositories
             return await _context.VehicleTypes.ToListAsync();
         }
 
-        public async Task<VehicleType> GetByIdAsync(int id)
+        public async Task<VehicleType> GetTypeByIdAsync(int id)
         {
-            return await _context.VehicleTypes.FindAsync(id);
+            return await _context.VehicleTypes
+                .Include(vt => vt.VehicleModels)
+                .FirstAsync(vt => vt.Id == id);
         }
 
         public async Task AddVehicleTypeAsync(VehicleType type)
@@ -51,7 +55,9 @@ namespace CarRentalSystem.DataAccess.Repositories
 
         public async Task<VehicleBrand> GetBrandByIdAsync(int id)
         {
-            return await _context.VehicleBrands.FindAsync(id);
+            return await _context.VehicleBrands
+                      .Include(b => b.Models)
+                      .FirstAsync(b => b.Id == id);
         }
 
         public async Task AddVehicleBrandAsync(VehicleBrand brand)
@@ -82,7 +88,9 @@ namespace CarRentalSystem.DataAccess.Repositories
 
         public async Task<VehicleModel?> GetVehicleModelByIdAsync(int id)
         {
-            return await _context.VehicleModels.FindAsync(id);
+            return await _context.VehicleModels
+                     .Include(vm => vm.Vehicles)
+                     .FirstOrDefaultAsync(vm => vm.Id == id);
         }
 
         public async Task AddVehicleModelAsync(VehicleModel model)
@@ -121,9 +129,59 @@ namespace CarRentalSystem.DataAccess.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Vehicle?> GetVehicleByIdAsync(int id)
+        public async Task<IEnumerable<Vehicle>> GetFilteredVehiclesAsync(VehicleFilterDal filter)
         {
-            return await _context.Vehicles.FindAsync(id);
+            var query = _context.Vehicles
+                .Include(v => v.VehicleModel)
+                    .ThenInclude(vm => vm.VehicleType)
+                .Include(v => v.VehicleModel)
+                    .ThenInclude(vm => vm.Brand)
+                .AsQueryable();
+
+            if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+            {
+                var startDateWithAddedHours = filter.StartDate.Value.AddHours(2);
+                var endDateWithAddedHours = filter.EndDate.Value.AddHours(2);
+
+                var startDateUtc = startDateWithAddedHours.ToUniversalTime();
+                var endDateUtc = endDateWithAddedHours.ToUniversalTime();
+
+                query = query.Where(vehicle => !vehicle.Reservations.Any(r =>
+                    r.Status != ReservationStatus.Completed &&
+                    r.Status != ReservationStatus.Cancelled &&
+                    r.StartDate < endDateUtc &&
+                    r.EndDate > startDateUtc));
+            }
+
+            if (filter.MinPrice.HasValue)
+            {
+                query = query.Where(v => v.DailyRate >= filter.MinPrice);
+            }
+
+            if (filter.MaxPrice.HasValue)
+            {
+                query = query.Where(v => v.DailyRate <= filter.MaxPrice);
+            }
+
+            if (filter.SelectedVehicleTypeIds != null && filter.SelectedVehicleTypeIds.Any())
+            {
+                query = query.Where(v => filter.SelectedVehicleTypeIds.Contains(v.VehicleModel.VehicleTypeId));
+            }
+
+            return await query.ToListAsync();
+        }
+
+
+
+        public async Task<Vehicle> GetVehicleByIdAsync(int id)
+        {
+            return await _context.Vehicles
+                .Include(v => v.Reservations)
+                  .Include(v => v.VehicleModel)
+                    .ThenInclude(vm => vm.Brand)
+                .Include(v => v.VehicleModel)
+                    .ThenInclude(vm => vm.VehicleType)
+                .FirstAsync(v => v.Id == id);
         }
 
         public async Task AddVehicleAsync(Vehicle vehicle)

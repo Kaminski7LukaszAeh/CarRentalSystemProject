@@ -1,5 +1,7 @@
 ﻿using CarRentalSystem.BusinessLogic.DataTransferObjects;
+using CarRentalSystem.DataAccess.Entities.Enums;
 using CarRentalSystem.Presentation.Models;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CarRentalSystem.Presentation.Mapping
@@ -88,6 +90,7 @@ namespace CarRentalSystem.Presentation.Mapping
             {
                 DailyRate = model.DailyRate,
                 VehicleModelId = model.VehicleModelId,
+                VehicleTypeId = model.VehicleTypeId,
             };
         }
         public static CreateReservationDto Map(CreateReservationViewModel vm, string userId)
@@ -98,6 +101,18 @@ namespace CarRentalSystem.Presentation.Mapping
                 UserId = userId,
                 StartDate = vm.StartDate,
                 EndDate = vm.EndDate,
+                TotalCost = vm.TotalCost
+            };
+        }
+        public static PaymentDto Map(PaymentViewModel vm)
+        {
+            return new PaymentDto
+            {
+                ReservationId = vm.ReservationId,
+                Amount = vm.Amount,
+                PaymentDate = vm.PaymentDate ?? DateTime.UtcNow,
+                Status = vm.Status ?? PaymentStatus.Pending, 
+                PaymentConfirmationNumber = vm.PaymentConfirmationNumber
             };
         }
     }
@@ -117,6 +132,7 @@ public static class DtoToViewModelMapper
             BrandName = dto.VehicleBrandName
         };
     }
+
     public static VehicleTypeViewModel Map(VehicleTypeDto dto)
     {
         return new VehicleTypeViewModel
@@ -137,6 +153,17 @@ public static class DtoToViewModelMapper
         {
             Id = dto.Id,
             Name = dto.Name
+        };
+    }
+    public static PaymentViewModel Map(PaymentDto dto)
+    {
+        return new PaymentViewModel
+        {
+            ReservationId = dto.ReservationId,
+            Amount = dto.Amount,
+            PaymentDate = dto.PaymentDate,
+            Status = dto.Status,
+            PaymentConfirmationNumber = dto.PaymentConfirmationNumber
         };
     }
 
@@ -189,10 +216,12 @@ public static class DtoToViewModelMapper
         };
     }
 
+
     public static List<ReservationViewModel> MapList(IEnumerable<ReservationDto> dtos)
     {
         return dtos.Select(Map).ToList();
     }
+
 
     public static List<SelectListItem> MapBrandsToSelectList(IEnumerable<VehicleBrandDto> brandDtos)
     {
@@ -207,5 +236,23 @@ public static class DtoToViewModelMapper
 
     public static List<SelectListItem> MapTypesToSelectList(IEnumerable<VehicleTypeDto> types) =>
         types.Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.TypeName }).ToList();
+}
+
+public static class FilterMapper
+{
+    public static VehicleFilterDto Map(VehicleFilter filter)
+    {
+        if (filter == null) return null;
+
+        return new VehicleFilterDto
+        {
+            StartDate = filter.StartDate,
+            EndDate = filter.EndDate,
+            MinPrice = filter.MinPrice,
+            MaxPrice = filter.MaxPrice,
+            SelectedVehicleTypeIds = filter.SelectedVehicleTypeIds
+
+        };
+    }
 }
 

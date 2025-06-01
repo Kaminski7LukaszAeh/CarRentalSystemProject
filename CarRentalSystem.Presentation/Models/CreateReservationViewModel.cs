@@ -22,7 +22,8 @@ namespace CarRentalSystem.Presentation.Models
         [ValidateNever]
         [BindNever]
         public decimal TotalCost { get; set; }
-
         public decimal DailyRate { get; set; }
+
+        public bool PayNow { get; set; }
     }
 }

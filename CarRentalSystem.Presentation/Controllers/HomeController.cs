@@ -15,7 +15,7 @@ namespace CarRentalSystem.Presentation.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return View(new VehicleFilter());
         }
 
         public IActionResult Privacy()
