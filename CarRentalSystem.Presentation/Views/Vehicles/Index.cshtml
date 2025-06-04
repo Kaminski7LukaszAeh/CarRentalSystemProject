@@ -12,79 +12,85 @@
     var minPrice = filter.MinPrice ?? 0;
     var maxPrice = filter.MaxPrice ?? 2000;
 }
-<h2>Dostępne Pojazdy</h2>
 
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <form id="filterForm" method="get" class="mb-4 row g-3 align-items-center">
-                <div class="col-12">
-                    <label for="DateRange">Data odbioru i zwrotu</label>
-                    <input type="text" class="form-control" id="DateRange" placeholder="Wybierz zakres dat" />
-                </div>
+<h2 class="text-center mb-5">Dostępne Pojazdy</h2>
 
-                <div class="col-12 d-flex gap-3">
-                    <div class="flex-grow-1">
-                        <label for="StartTime">Godzina odbioru</label>
-                        <select class="form-control" id="StartTime"></select>
+<div class="container mt-4">
+    <div class="row">
+        <!-- FILTR -->
+        <div class="col-lg-4 mb-4">
+            <div class="bg-dark p-4 rounded shadow border border-secondary-subtle">
+                <form id="filterForm" method="get" class="row g-4">
+                    <div class="col-12">
+                        <label for="DateRange" class="form-label">Data odbioru i zwrotu</label>
+                        <input type="text" class="form-control bg-dark text-light border-secondary" id="DateRange" placeholder="Wybierz zakres dat" />
                     </div>
-                    <div class="flex-grow-1">
-                        <label for="EndTime">Godzina zwrotu</label>
-                        <select class="form-control" id="EndTime"></select>
-                    </div>
-                </div>
 
-                <input type="hidden" id="StartDate" name="StartDate" value="@filter.StartDate?.ToString("yyyy-MM-ddTHH:mm")" />
-                <input type="hidden" id="EndDate" name="EndDate" value="@filter.EndDate?.ToString("yyyy-MM-ddTHH:mm")" />
-
-                <div class="col-12">
-                    <label>Zakres cen:</label>
-                    <div id="priceSlider" class="mb-2"></div>
-                    <div class="d-flex justify-content-between">
-                        <span id="minPriceDisplay">@minPrice zł</span>
-                        <span id="maxPriceDisplay">@maxPrice zł</span>
-                    </div>
-                    <input type="hidden" name="MinPrice" id="MinPrice" value="@minPrice" />
-                    <input type="hidden" name="MaxPrice" id="MaxPrice" value="@maxPrice" />
-                </div>
-
-                <div class="col-12">
-                    <label class="form-label">Typy pojazdów:</label><br />
-                    @{
-                        var vehicleTypes = ViewData["VehicleTypes"] as List<VehicleTypeDto>;
-                    }
-                    @foreach (var type in vehicleTypes)
-                    {
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="SelectedVehicleTypeIds" value="@type.Id"
-                            @(filter.SelectedVehicleTypeIds.Contains(type.Id) ? "checked" : "") />
-                            <label class="form-check-label">@type.TypeName</label>
+                    <div class="col-12 d-flex gap-3">
+                        <div class="flex-grow-1">
+                            <label for="StartTime" class="form-label">Godzina odbioru</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="StartTime"></select>
                         </div>
+                        <div class="flex-grow-1">
+                            <label for="EndTime" class="form-label">Godzina zwrotu</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="EndTime"></select>
+                        </div>
+                    </div>
+
+                    <input type="hidden" id="StartDate" name="StartDate" value="@filter.StartDate?.ToString("yyyy-MM-ddTHH:mm")" />
+                    <input type="hidden" id="EndDate" name="EndDate" value="@filter.EndDate?.ToString("yyyy-MM-ddTHH:mm")" />
+
+                    <div class="col-12">
+                        <label class="form-label">Zakres cen:</label>
+                        <div id="priceSlider" class="mb-2"></div>
+                        <div class="d-flex justify-content-between small">
+                            <span id="minPriceDisplay">@minPrice zł</span>
+                            <span id="maxPriceDisplay">@maxPrice zł</span>
+                        </div>
+                        <input type="hidden" name="MinPrice" id="MinPrice" value="@minPrice" />
+                        <input type="hidden" name="MaxPrice" id="MaxPrice" value="@maxPrice" />
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Typy pojazdów:</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var type in ViewData["VehicleTypes"] as List<VehicleTypeDto>)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input bg-dark border-light" type="checkbox" name="SelectedVehicleTypeIds" value="@type.Id"
+                                           @(filter.SelectedVehicleTypeIds.Contains(type.Id) ? "checked" : "") />
+                                    <label class="form-check-label text-light">@type.TypeName</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="col-12 d-flex justify-content-end mt-3 gap-2">
+                        <button type="submit" class="btn btn-dark border border-light">Filtruj</button>
+                        <a href="@Url.Action("Index")" class="btn btn-secondary">Resetuj</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- LISTA POJAZDÓW -->
+        <div class="col-lg-8">
+            @if (!Model.Any())
+            {
+                <p class="text-center mt-5 text-light">Brak dostępnych pojazdów.</p>
+            }
+            else
+            {
+                <div class="d-flex flex-wrap gap-4 justify-content-center">
+                    @foreach (var vehicle in Model)
+                    {
+                        @await Html.PartialAsync("_VehicleCardPartial", vehicle)
                     }
                 </div>
-
-                <div class="col-auto mt-4">
-                    <button type="submit" class="btn btn-primary">Filtruj</button>
-                    <a href="@Url.Action("Index")" class="btn btn-secondary ms-2">Resetuj</a>
-                </div>
-            </form>
+            }
         </div>
     </div>
 </div>
-
-@if (!Model.Any())
-{
-    <p>Brak dostępnych pojazdów.</p>
-}
-else
-{
-    <div class="d-flex flex-wrap gap-3">
-        @foreach (var vehicle in Model)
-        {
-            @await Html.PartialAsync("_VehicleCardPartial", vehicle)
-        }
-    </div>
-}
 
 <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css" rel="stylesheet" />

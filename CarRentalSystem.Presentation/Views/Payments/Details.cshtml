@@ -4,11 +4,11 @@
     ViewData["Title"] = "Szczegóły płatności";
 }
 
-<h2 class="mt-4">Szczegóły płatności</h2>
+<div class="d-flex justify-content-center mt-5">
+    <div class="col-md-8 bg-dark p-5 rounded shadow border border-secondary-subtle">
+        <h2 class="mb-4 text-white">Szczegóły płatności</h2>
 
-<div class="card">
-    <div class="card-body">
-        <dl class="row">
+        <dl class="row text-light">
             <dt class="col-sm-4">Numer rezerwacji</dt>
             <dd class="col-sm-8">@Model.ReservationId</dd>
 
@@ -30,7 +30,7 @@
 
         @if (Model.Status != CarRentalSystem.DataAccess.Entities.Enums.PaymentStatus.Completed)
         {
-            <a asp-action="Payment" asp-route-reservationId="@Model.ReservationId" class="btn btn-primary">Opłać</a>
+            <a asp-action="Payment" asp-route-reservationId="@Model.ReservationId" class="btn btn-dark border border-light w-100 mt-3">Opłać</a>
         }
     </div>
 </div>

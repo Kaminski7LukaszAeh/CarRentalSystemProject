@@ -1,50 +1,58 @@
 ﻿@model ManageVehicleBrandsViewModel
 @{
-    ViewData["Title"] = "Manage Vehicle Brands";
+    ViewData["Title"] = "Edytuj Marki";
 }
-<div class="mb-3">
-    <button class="btn btn-secondary" onclick="history.back()">← Powrót</button>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="bg-dark text-light p-5 rounded shadow border border-secondary-subtle">
+
+                <div class="mb-3">
+                    <button class="btn btn-secondary" onclick="history.back()">← Powrót</button>
+                </div>
+
+                <h2 class="text-white mb-4">Edytuj Marki</h2>
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["Error"]</div>
+                }
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                }
+
+                @await Html.PartialAsync("_AddVehicleBrandPartial", Model.NewVehicleBrand)
+
+                <h4 class="mt-4">Dostępne Marki</h4>
+                <table class="table table-bordered table-dark table-striped mt-3">
+                    <thead>
+                        <tr>
+                            <th>Marka</th>
+                            <th>Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var brand in Model.VehicleBrands)
+                        {
+                            <tr>
+                                <td>@brand.Name</td>
+                                <td>
+                                    <form asp-action="DeleteVehicleBrand" asp-route-id="@brand.Id" method="post" onsubmit="return confirm('Czy napewno chcesz skasować ten markę?');">
+                                        <button type="submit" class="btn btn-sm btn-danger">Usuń</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
 </div>
 
-<h2>Edytuj marki</h2>
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-
-@await Html.PartialAsync("_AddVehicleBrandPartial", Model.NewVehicleBrand)
-
-<h3 class="mt-4">Dostępne marki</h3>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Marka</th>
-            <th>Akcje</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var brand in Model.VehicleBrands)
-        {
-            <tr>
-                <td>@brand.Name</td>
-                <td>
-                    <form asp-action="DeleteVehicleBrand" asp-route-id="@brand.Id" method="post" style="display:inline;"
-                          onsubmit="return confirm('Czy napewno chcesz skasować ten markę?');">
-                        <button type="submit" class="btn btn-sm btn-danger">Usuń</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

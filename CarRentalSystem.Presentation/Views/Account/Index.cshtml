@@ -2,18 +2,21 @@
     ViewData["Title"] = "Zarządzaj Kontem";
 }
 
-<h2>@ViewData["Title"]</h2>
+<div class="d-flex justify-content-center mt-5">
+    <div class="col-md-6 bg-dark p-5 rounded shadow border border-secondary-subtle">
+        <h2 class="mb-4 text-white">@ViewData["Title"]</h2>
 
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">Usuń Konto</h5>
-        <p class="card-text text-danger">
-            Ostrzeżenie: ta czynność jest nieodwracalna. Usunięcie konta spowoduje utratę wszystkich powiązanych danych.
-        </p>
-        <form asp-action="DeleteAccount" method="post">
-            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
-                Usuń konto
-            </button>
-        </form>
+        <div class="bg-light text-dark p-4 rounded">
+            <h5 class="mb-3">Usuń Konto</h5>
+            <p class="text-danger mb-4">
+                Ostrzeżenie: ta czynność jest nieodwracalna. Usunięcie konta spowoduje utratę wszystkich powiązanych danych.
+            </p>
+            <form asp-action="DeleteAccount" method="post">
+                <button type="submit" class="btn btn-danger w-100"
+                        onclick="return confirm('Czy na pewno chcesz usunąć konto? Tej operacji nie można cofnąć.');">
+                    Usuń konto
+                </button>
+            </form>
+        </div>
     </div>
 </div>

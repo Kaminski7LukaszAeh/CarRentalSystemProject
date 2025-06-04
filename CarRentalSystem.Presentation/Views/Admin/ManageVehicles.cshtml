@@ -1,61 +1,67 @@
 ﻿@model ManageVehiclesViewModel
 @{
-    ViewData["Title"] = "Zarządzaj Pojazdami";
+    ViewData["Title"] = "Edytuj Pojazdy";
 }
-<div class="mb-3">
-    <button class="btn btn-secondary" onclick="history.back()">← Powrót</button>
+
+<div class="d-flex justify-content-center mt-5">
+    <div class="col-md-10 bg-dark p-5 rounded shadow border border-secondary-subtle">
+        <div class="mb-3">
+            <button class="btn btn-secondary" onclick="history.back()">← Powrót</button>
+        </div>
+
+        <h2 class="text-white mb-4">Edytuj Pojazdy</h2>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+
+        @await Html.PartialAsync("_AddVehiclePartial", Model.NewVehicle)
+
+        <h4 class="text-white mt-5">Dostępne Pojazdy</h4>
+
+        @if (Model.Vehicles.Any())
+        {
+            <table class="table table-dark table-bordered table-hover mt-3">
+                <thead>
+                    <tr>
+                        <th>Marka</th>
+                        <th>Model</th>
+                        <th>Typ</th>
+                        <th>Stawka dzienna</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model.Vehicles)
+                    {
+                        <tr>
+                            <td>@v.BrandName</td>
+                            <td>@v.ModelName</td>
+                            <td>@v.TypeName</td>
+                            <td>@v.DailyRate.ToString("C")</td>
+                            <td>
+                                <form asp-action="DeleteVehicle" asp-route-id="@v.Id" method="post"
+                                      onsubmit="return confirm('Czy na pewno chcesz usunąć ten pojazd?');">
+                                    <button class="btn btn-danger btn-sm" type="submit">Usuń</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-light">Brak dostępnych pojazdów.</p>
+        }
+    </div>
 </div>
 
-<h2>Edytuj Pojazdy</h2>
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-
-@await Html.PartialAsync("_AddVehiclePartial", Model.NewVehicle)
-
-<h3 class="mt-4">Dostępne Pojazdy</h3>
-
-@if (Model.Vehicles.Any())
-{
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Marka</th>
-                <th>Model</th>
-                <th>Typ</th>
-                <th>Dzienna stawka</th>
-                <th>Akcje</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var v in Model.Vehicles)
-            {
-                <tr>
-                    <td>@v.BrandName</td>
-                    <td>@v.ModelName</td>
-                    <td>@v.TypeName</td>
-                    <td>@v.DailyRate.ToString("C")</td>
-                    <td>
-                        <form asp-action="DeleteVehicle" asp-route-id="@v.Id" method="post"
-                              onsubmit="return confirm('Czy napewno chcesz skasować ten markę pojazd?');">
-                            <button class="btn btn-danger btn-sm" type="submit">Usuń</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>Brak dostępnych pojazdów.</p>
-}
 @section Scripts {
     <script>
         $(function () {
@@ -64,7 +70,7 @@ else
                 if (typeId) {
                     $.get('/Admin/GetBrandsByType', { typeId: typeId }, function (brands) {
                         var $brand = $('#vehicleBrand');
-                        $brand.empty().append('<option value="">-- Select Brand --</option>');
+                        $brand.empty().append('<option value="">-- Wybierz markę --</option>');
                         $.each(brands, function (i, brand) {
                             $brand.append(`<option value="${brand.id}">${brand.name}</option>`);
                         });
@@ -81,7 +87,7 @@ else
                 if (brandId && typeId) {
                     $.get('/Admin/GetModelsByBrandAndType', { brandId: brandId, typeId: typeId }, function (models) {
                         var $model = $('#vehicleModel');
-                        $model.empty().append('<option value="">-- Select Model --</option>');
+                        $model.empty().append('<option value="">-- Wybierz model --</option>');
                         $.each(models, function (i, model) {
                             $model.append(`<option value="${model.id}">${model.name}</option>`);
                         });

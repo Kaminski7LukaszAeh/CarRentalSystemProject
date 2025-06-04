@@ -1,4 +1,6 @@
 ﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
     var startDate = Context.Request.Query["StartDate"].ToString();
     var endDate = Context.Request.Query["EndDate"].ToString();
 
@@ -19,35 +21,81 @@
         endTimePart = parsedEnd.ToString("HH:mm");
     }
 }
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6 col-md-8 col-sm-12">
-            <div class="card shadow p-4">
-                <h4 class="mb-4 text-center">Wyszukaj dostępne pojazdy</h4>
 
-                <div class="mb-3">
-                    <label for="DateRange">Data odbioru i zwrotu</label>
-                    <input type="text" id="DateRange" class="form-control" placeholder="Wybierz zakres dat" />
-                </div>
+<style>
+    body {
+        background: url('/images/bg-dark.jpg') no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+    }
 
-                <div class="row mb-3">
-                    <div class="col">
-                        <label for="StartTime">Godzina odbioru</label>
-                        <select class="form-control" id="StartTime"></select>
-                    </div>
-                    <div class="col">
-                        <label for="EndTime">Godzina zwrotu</label>
-                        <select class="form-control" id="EndTime"></select>
-                    </div>
-                </div>
+    .hero-wrapper {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
 
-                <input type="hidden" id="StartDate" value="@startDatePart" />
-                <input type="hidden" id="EndDate" value="@endDatePart" />
+    .search-card {
+        background-color: rgba(0, 0, 0, 0.65);
+        padding: 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+        max-width: 500px;
+        width: 100%;
+    }
 
-                <div class="d-grid">
-                    <button class="btn btn-primary" id="searchBtn">Szukaj</button>
-                </div>
+    .search-card label {
+        color: #ddd;
+    }
+
+    h4 {
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .form-control, .btn {
+        border-radius: 8px;
+    }
+
+    .btn-primary {
+        background-color: #fff;
+        color: #000;
+        border: none;
+        font-weight: 600;
+    }
+
+    .btn-primary:hover {
+        background-color: #f0f0f0;
+    }
+</style>
+
+<div class="hero-wrapper">
+    <div class="search-card">
+        <h4 class="mb-4 text-center">Wyszukaj dostępne pojazdy</h4>
+
+        <div class="mb-3">
+            <label for="DateRange">Data odbioru i zwrotu</label>
+            <input type="text" id="DateRange" class="form-control" placeholder="Wybierz zakres dat" />
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <label for="StartTime">Godzina odbioru</label>
+                <select class="form-control" id="StartTime"></select>
             </div>
+            <div class="col">
+                <label for="EndTime">Godzina zwrotu</label>
+                <select class="form-control" id="EndTime"></select>
+            </div>
+        </div>
+
+        <input type="hidden" id="StartDate" value="@startDatePart" />
+        <input type="hidden" id="EndDate" value="@endDatePart" />
+
+        <div class="d-grid">
+            <button class="btn btn-primary" id="searchBtn">Szukaj</button>
         </div>
     </div>
 </div>

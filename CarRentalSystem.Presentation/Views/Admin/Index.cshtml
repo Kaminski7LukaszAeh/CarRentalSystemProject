@@ -1,21 +1,42 @@
 ﻿@{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "Admin Panel";
 }
 
-<h2>Admin Panel</h2>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="bg-dark text-light p-5 rounded shadow border border-secondary-subtle">
+                <h2 class="mb-4 text-white">Panel administratora</h2>
 
-<div class="list-group">
+                <div class="list-group">
+                    <a class="list-group-item list-group-item-action bg-dark text-light border border-secondary" 
+                       data-bs-toggle="collapse" 
+                       href="#vehicleManagementCollapse" 
+                       role="button" 
+                       aria-expanded="false" 
+                       aria-controls="vehicleManagementCollapse">
+                        Zarządzanie pojazdami
+                    </a>
 
-    <a class="list-group-item list-group-item-action" data-bs-toggle="collapse" href="#vehicleManagementCollapse" role="button" aria-expanded="false" aria-controls="vehicleManagementCollapse">
-        Zarządzanie pojazdami
-    </a>
-    <div class="collapse ms-3" id="vehicleManagementCollapse">
-        <div class="list-group">
-            <a asp-action="ManageVehicles" class="list-group-item list-group-item-action">Edytuj dostępne pojazdy</a>
-            <a asp-action="ManageVehicleBrands" class="list-group-item list-group-item-action">Edytuj marki</a>
-            <a asp-action="ManageVehicleModels" class="list-group-item list-group-item-action">Edytuj modele</a>
-            <a asp-action="ManageVehicleTypes" class="list-group-item list-group-item-action">Edytuj typy</a>
+                    <div class="collapse show mt-2" id="vehicleManagementCollapse">
+                        <div class="list-group">
+                            <a asp-action="ManageVehicles" class="list-group-item list-group-item-action bg-secondary text-white border-0 rounded mb-1">
+                                Edytuj dostępne pojazdy
+                            </a>
+                            <a asp-action="ManageVehicleBrands" class="list-group-item list-group-item-action bg-secondary text-white border-0 rounded mb-1">
+                                Edytuj marki
+                            </a>
+                            <a asp-action="ManageVehicleModels" class="list-group-item list-group-item-action bg-secondary text-white border-0 rounded mb-1">
+                                Edytuj modele
+                            </a>
+                            <a asp-action="ManageVehicleTypes" class="list-group-item list-group-item-action bg-secondary text-white border-0 rounded">
+                                Edytuj typy
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
-
 </div>

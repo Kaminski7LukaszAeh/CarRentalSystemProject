@@ -1,57 +1,60 @@
 ﻿@using CarRentalSystem.DataAccess.Entities.Enums
-
 @model List<ReservationViewModel>
 
-<h2>Moje Rezerwacje</h2>
+<div class="container py-5">
+    <h2 class="text-white mb-4">Moje Rezerwacje</h2>
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["Error"]
-    </div>
-}
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
 
-@if (!Model.Any())
-{
-    <p>Nie masz jeszcze rezerwacji.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Pojazd</th>
-                <th>Czas wypożyczenia</th>
-                <th>Czas zwrotu</th>
-                <th>Czas rezerwacji</th>
-                <th>Całkowity koszt</th>
-                <th>Status</th>
-                <th>Akcje</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var reservation in Model)
-            {
-                <tr>
-                    <td>@reservation.BrandName @reservation.ModelName (@reservation.VehicleTypeName)</td>
-                    <td>@reservation.StartDate.ToShortDateString() (@reservation.StartDate.ToShortTimeString())</td>
-                    <td>@reservation.EndDate.ToShortDateString() (@reservation.EndDate.ToShortTimeString())</td>
-                    <td>@reservation.CreatedAt.ToShortDateString() (@reservation.CreatedAt.ToShortTimeString())</td>
-                    <td>@reservation.TotalCost.ToString("C")</td>
-                    <td>@reservation.Status</td>
-                    <td>
-                        @if (reservation.Status == ReservationStatus.Active)
-                        {
-                            <form asp-action="CancelReservation" asp-route-id="@reservation.Id" method="post" onsubmit="return confirm('Czy na pewno chcesz anulować tę rezerwację?');" style="display:inline-block;">
-                                <button type="submit" class="btn btn-danger btn-sm">Anuluj</button>
-                            </form>
-                        }
-                        <a asp-controller="Payments" asp-action="Details" asp-route-reservationId="@reservation.Id" class="btn btn-primary btn-sm ms-1">
-                            Szczegóły płatności
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+    @if (!Model.Any())
+    {
+        <p class="text-light">Nie masz jeszcze rezerwacji.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-dark table-hover table-bordered rounded shadow-sm overflow-hidden">
+                <thead class="table-secondary text-dark">
+                    <tr>
+                        <th>Pojazd</th>
+                        <th>Czas wypożyczenia</th>
+                        <th>Czas zwrotu</th>
+                        <th>Czas rezerwacji</th>
+                        <th>Całkowity koszt</th>
+                        <th>Status</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var reservation in Model)
+                    {
+                        <tr>
+                            <td>@reservation.BrandName @reservation.ModelName (@reservation.VehicleTypeName)</td>
+                            <td>@reservation.StartDate.ToShortDateString() (@reservation.StartDate.ToShortTimeString())</td>
+                            <td>@reservation.EndDate.ToShortDateString() (@reservation.EndDate.ToShortTimeString())</td>
+                            <td>@reservation.CreatedAt.ToShortDateString() (@reservation.CreatedAt.ToShortTimeString())</td>
+                            <td>@reservation.TotalCost.ToString("C")</td>
+                            <td>@reservation.Status</td>
+                            <td class="text-nowrap">
+                                @if (reservation.Status == ReservationStatus.Active)
+                                {
+                                    <form asp-action="CancelReservation" asp-route-id="@reservation.Id" method="post" onsubmit="return confirm('Czy na pewno chcesz anulować tę rezerwację?');" style="display:inline-block;">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Anuluj</button>
+                                    </form>
+                                }
+                                <a asp-controller="Payments" asp-action="Details" asp-route-reservationId="@reservation.Id" class="btn btn-outline-primary btn-sm ms-1">
+                                    Szczegóły płatności
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

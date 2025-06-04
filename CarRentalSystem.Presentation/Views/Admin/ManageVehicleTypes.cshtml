@@ -1,52 +1,55 @@
 ﻿@model ManageVehicleTypesViewModel
 @{
-    ViewData["Title"] = "Manage Vehicle Types";
+    ViewData["Title"] = "Edytuj Typy Pojazdów";
 }
-<div class="mb-3">
-    <button class="btn btn-secondary" onclick="history.back()">← Powrót</button>
+
+<div class="d-flex justify-content-center mt-5">
+    <div class="col-md-8 bg-dark p-5 rounded shadow border border-secondary-subtle">
+        <div class="mb-3">
+            <button class="btn btn-secondary" onclick="history.back()">← Powrót</button>
+        </div>
+
+        <h2 class="text-white mb-4">Edytuj Typy Pojazdów</h2>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+
+        @await Html.PartialAsync("_AddVehicleTypePartial", Model.NewVehicleType)
+
+        <h4 class="text-white mt-5">Dostępne Typy</h4>
+        <table class="table table-dark table-bordered table-hover mt-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nazwa Typu</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var type in Model.VehicleTypes)
+                {
+                    <tr>
+                        <td>@type.Id</td>
+                        <td>@type.TypeName</td>
+                        <td>
+                            <form asp-action="DeleteVehicleType" asp-route-id="@type.Id" method="post" style="display:inline;"
+                                  onsubmit="return confirm('Czy na pewno chcesz usunąć ten typ pojazdu?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Usuń</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<h2>Edytuj typy</h2>
-
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
-
-@await Html.PartialAsync("_AddVehicleTypePartial", Model.NewVehicleType)
-
-<h3 class="mt-4">Dostępne typy</h3>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Typ</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var type in Model.VehicleTypes)
-        {
-            <tr>
-                <td>@type.Id</td>
-                <td>@type.TypeName</td>
-                <td>
-                    <form asp-action="DeleteVehicleType" asp-route-id="@type.Id" method="post"
-                          style="display:inline;"
-                          onsubmit="return confirm('Are you sure you want to delete this vehicle type?');">
-                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
