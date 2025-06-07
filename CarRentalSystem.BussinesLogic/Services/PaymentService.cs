@@ -30,9 +30,6 @@ namespace CarRentalSystem.BusinessLogic.Services
                 return Result.Failure("Payment not found for the reservation.");
 
             UpdatePayment(payment, amount);
-
-            reservation.Status = ReservationStatus.Paid;
-
             await _reservationRepository.SaveChangesAsync();
 
             return Result.Success("Payment processed successfully.");
@@ -45,6 +42,7 @@ namespace CarRentalSystem.BusinessLogic.Services
                 return Result<PaymentDto>.Failure("Payment not found.");
 
             var dto = EntityToDtoMapper.Map(payment);
+
             return Result<PaymentDto>.Success(dto);
         }
 

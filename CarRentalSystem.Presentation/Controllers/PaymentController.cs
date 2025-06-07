@@ -54,8 +54,6 @@ namespace CarRentalSystem.Presentation.Controllers
                 return View(model);
             }
 
-            await _reservationService.UpdateReservationStatusAsync(model.ReservationId, ReservationStatus.Paid);
-
             TempData["Success"] = "Płatność zakończona sukcesem.";
             return RedirectToAction("MyReservations", "Reservations");
         }

@@ -5,7 +5,6 @@ using CarRentalSystem.BusinessLogic.Mapping;
 using CarRentalSystem.DataAccess.Entities;
 using CarRentalSystem.DataAccess.Entities.Enums;
 using CarRentalSystem.DataAccess.Interfaces;
-using CarRentalSystem.DataAccess.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace CarRentalSystem.BusinessLogic.Services
@@ -21,6 +20,24 @@ namespace CarRentalSystem.BusinessLogic.Services
             _reservationRepository = reservationRepository;
             _vehicleRepository = vehicleRepository;
             _logger = logger;
+        }
+
+        public async Task<Result<IEnumerable<ReservationDto>>> GetAllReservationsAsync()
+        {
+            try
+            {
+                var reservations = await _reservationRepository.GetAllReservationsAsync();
+
+                await UpdateOverdueReservationsAsync(reservations);
+
+                var dtos = EntityToDtoMapper.MapList(reservations);
+                return Result<IEnumerable<ReservationDto>>.Success(dtos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve all reservations.");
+                return Result<IEnumerable<ReservationDto>>.Failure("Failed to retrieve reservations.");
+            }
         }
 
         public async Task<Result<Reservation>> GetReservationByIdAsync(int id)
@@ -111,7 +128,7 @@ namespace CarRentalSystem.BusinessLogic.Services
         {
             try
             {
-                if (dto.EndDate < dto.StartDate)
+                if (dto.EndDate < dto.StartDate || dto.EndDate == dto.StartDate)
                     return Result<Reservation>.Failure("End date must be after start date.");
 
                 var vehicle = await _vehicleRepository.GetVehicleByIdAsync(dto.VehicleId);
@@ -174,8 +191,13 @@ namespace CarRentalSystem.BusinessLogic.Services
                     return Result.Failure("Reservation not found.");
 
                 reservation.Status = status;
-                await _reservationRepository.SaveChangesAsync();
 
+                if (status == ReservationStatus.Completed)
+                {
+                    reservation.Payment.Status = PaymentStatus.Completed;
+                }
+
+                await _reservationRepository.SaveChangesAsync();
                 return Result.Success("Reservation status updated.");
             }
             catch (Exception ex)
@@ -211,33 +233,85 @@ namespace CarRentalSystem.BusinessLogic.Services
             return days * dailyRate;
         }
 
-        private async Task UpdateOverdueReservationsAsync(IEnumerable<Reservation> reservations)
+        public async Task UpdateOverdueReservationsAsync(IEnumerable<Reservation> reservations)
         {
+            var today = DateTime.UtcNow.Date;
+
             foreach (var reservation in reservations)
             {
                 if (reservation.Payment == null || reservation.Payment.Status != PaymentStatus.Completed)
                 {
-                    if (DateTime.UtcNow.Date > reservation.StartDate.Date)
+                    if (today > reservation.StartDate.Date)
                     {
-                        var overdueDays = (DateTime.UtcNow.Date - reservation.StartDate.Date).Days;
+                        var overdueDays = (today - reservation.StartDate.Date).Days;
 
                         if (overdueDays > 0)
                         {
                             reservation.Status = ReservationStatus.Overdue;
 
                             var dailyRate = reservation.Vehicle?.DailyRate ?? 0m;
-
                             var additionalCost = overdueDays * dailyRate * 0.5m;
-
                             reservation.TotalCost += additionalCost;
 
                             await _reservationRepository.UpdateAsync(reservation);
                         }
                     }
                 }
+                else if (reservation.Payment.Status == PaymentStatus.Completed &&
+                         !reservation.IsReturned &&
+                         today > reservation.EndDate.Date)
+                {
+                    var overdueDays = (today - reservation.EndDate.Date).Days;
+
+                    if (overdueDays > 0)
+                    {
+                        reservation.Status = ReservationStatus.Overdue;
+
+                        var dailyRate = reservation.Vehicle?.DailyRate ?? 0m;
+                        var lateReturnFee = overdueDays * dailyRate * 0.75m;
+                        reservation.TotalCost += lateReturnFee;
+
+                        if (reservation.Payment != null)
+                        {
+                            reservation.Payment.Status = PaymentStatus.Pending;
+                        }
+
+                        await _reservationRepository.UpdateAsync(reservation);
+                    }
+                }
+                else if (reservation.Payment.Status == PaymentStatus.Completed &&
+                         reservation.IsReturned &&
+                         today > reservation.EndDate.Date)
+                {
+                    if (reservation.Status != ReservationStatus.Completed)
+                    {
+                        reservation.Status = ReservationStatus.Completed;
+                        await _reservationRepository.UpdateAsync(reservation);
+                    }
+                }
             }
         }
 
+        public async Task<Result> MarkAsReturnedAsync(int reservationId)
+        {
+            var reservation = await _reservationRepository.GetByIdAsync(reservationId);
+            if (reservation == null)
+                return Result.Failure("Reservation not found.");
+
+            if (reservation.IsReturned)
+                return Result.Failure("Vehicle already marked as returned.");
+
+            reservation.IsReturned = true;
+
+            if (reservation.EndDate.Date < DateTime.UtcNow.Date &&
+                reservation.Payment?.Status == PaymentStatus.Completed)
+            {
+                reservation.Status = ReservationStatus.Completed;
+            }
+
+            await _reservationRepository.UpdateAsync(reservation);
+            return Result.Success("Vehicle marked as returned.");
+        }
 
     }
 }

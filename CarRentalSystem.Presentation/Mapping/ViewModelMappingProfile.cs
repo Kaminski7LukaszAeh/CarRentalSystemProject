@@ -101,7 +101,8 @@ namespace CarRentalSystem.Presentation.Mapping
                 UserId = userId,
                 StartDate = vm.StartDate,
                 EndDate = vm.EndDate,
-                TotalCost = vm.TotalCost
+                TotalCost = vm.TotalCost,
+                IsReturned = vm.IsReturned
             };
         }
         public static PaymentDto Map(PaymentViewModel vm)
@@ -212,7 +213,10 @@ public static class DtoToViewModelMapper
             ModelName = dto.ModelName,
             VehicleTypeName = dto.VehicleTypeName,
             CreatedAt = dto.CreatedAt,
-            Status = dto.Status
+            Status = dto.Status,
+            UserId = dto.UserId,
+            PaymentStatus = dto.PaymentStatus,
+            IsReturned = dto.IsReturned
         };
     }
 

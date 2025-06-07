@@ -4,6 +4,7 @@ namespace CarRentalSystem.DataAccess.Interfaces
 {
     public interface IReservationRepository
     {
+        Task<IEnumerable<Reservation>> GetAllReservationsAsync();
         Task<Reservation?> GetByIdAsync(int reservationId);
         Task<List<Reservation>> GetReservationsByUserIdAsync(string userId);
         Task<IEnumerable<Reservation>> GetReservationsByVehicleIdAsync(int vehicleId);

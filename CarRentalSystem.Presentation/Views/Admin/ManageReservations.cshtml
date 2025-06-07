@@ -1,0 +1,56 @@
+﻿@using CarRentalSystem.DataAccess.Entities.Enums
+@model IEnumerable<ReservationViewModel>
+
+<h2>Zarządzaj Rezerwacjami</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Pojazd</th>
+            <th>Start</th>
+            <th>Koniec</th>
+            <th>Status</th>
+            <th>Zmień Status</th>
+            <th>Akcje</th> <!-- New column for actions -->
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reservation in Model)
+        {
+            <tr>
+                <td>@($"{reservation.BrandName} {reservation.ModelName} ({reservation.VehicleTypeName})")</td>
+                <td>@reservation.StartDate.ToLocalTime().ToShortDateString()</td>
+                <td>@reservation.EndDate.ToLocalTime().ToShortDateString()</td>
+                <td>@reservation.Status</td>
+                <td>
+                    <form asp-action="UpdateReservationStatus" method="post">
+                        <input type="hidden" name="reservationId" value="@reservation.Id" />
+                        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                            @foreach (ReservationStatus status in Enum.GetValues(typeof(ReservationStatus)))
+                            {
+                                var isSelected = status == reservation.Status ? "selected" : "";
+                                <option value="@status" selected="@isSelected">@status</option>
+                            }
+                        </select>
+                    </form>
+                </td>
+                <td>
+                    @if (!reservation.IsReturned)
+                    {
+                        <form asp-action="MarkAsReturned" method="post" style="display:inline;">
+                            <input type="hidden" name="reservationId" value="@reservation.Id" />
+                            <button type="submit" class="btn btn-sm btn-success"
+                                    onclick="return confirm('Are you sure you want to mark this vehicle as returned?');">
+                                Mark as Returned
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Returned</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

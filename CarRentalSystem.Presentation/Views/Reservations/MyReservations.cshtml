@@ -26,7 +26,8 @@
                         <th>Czas zwrotu</th>
                         <th>Czas rezerwacji</th>
                         <th>Całkowity koszt</th>
-                        <th>Status</th>
+                        <th>Status Rezerwacji</th>
+                        <th>Status Płatności</th>
                         <th>Akcje</th>
                     </tr>
                 </thead>
@@ -40,8 +41,9 @@
                             <td>@reservation.CreatedAt.ToShortDateString() (@reservation.CreatedAt.ToShortTimeString())</td>
                             <td>@reservation.TotalCost.ToString("C")</td>
                             <td>@reservation.Status</td>
+                            <td>@reservation.PaymentStatus</td>
                             <td class="text-nowrap">
-                                @if (reservation.Status == ReservationStatus.Active)
+                                @if (reservation.PaymentStatus == PaymentStatus.Pending && reservation.Status != ReservationStatus.Overdue)
                                 {
                                     <form asp-action="CancelReservation" asp-route-id="@reservation.Id" method="post" onsubmit="return confirm('Czy na pewno chcesz anulować tę rezerwację?');" style="display:inline-block;">
                                         <button type="submit" class="btn btn-outline-danger btn-sm">Anuluj</button>

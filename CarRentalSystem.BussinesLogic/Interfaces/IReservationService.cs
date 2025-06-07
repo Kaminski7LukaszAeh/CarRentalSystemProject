@@ -7,6 +7,7 @@ namespace CarRentalSystem.BusinessLogic.Interfaces
 {
     public interface IReservationService
     {
+        Task<Result<IEnumerable<ReservationDto>>> GetAllReservationsAsync();
         Task<Result<Reservation>> GetReservationByIdAsync(int id);
         Task<Result<IEnumerable<ReservationDto>>> GetReservationsByUserAsync(string userId);
         Task<Result<IEnumerable<ReservationDto>>> GetReservationsByVehicleAsync(int vehicleId);
@@ -16,6 +17,7 @@ namespace CarRentalSystem.BusinessLogic.Interfaces
         Task<Result<Reservation>> CreateReservationAsync(CreateReservationDto dto);
         Task<Result> CancelReservationAsync(int reservationId, string userId);
         Task<Result> UpdateReservationStatusAsync(int reservationId, ReservationStatus status);
+        Task<Result> MarkAsReturnedAsync(int reservationId);
         decimal CalculateTotalCost(DateTime startDate, DateTime endDate, decimal dailyRate);
         
     }

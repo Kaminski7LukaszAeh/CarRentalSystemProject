@@ -44,7 +44,6 @@ namespace CarRentalSystem.Presentation.Controllers
         }
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateReservation(CreateReservationViewModel model)
         {
             if (!ModelState.IsValid)
@@ -72,7 +71,7 @@ namespace CarRentalSystem.Presentation.Controllers
                 }
                 model.DailyRate = vehicle.Value.DailyRate;
                 TempData["Error"] = result.Error ?? "Failed to create reservation.";
-                return View(model);
+                return RedirectToAction("MyReservations", "Reservations");
             }
 
             var reservationId = result.Value.Id;
@@ -140,21 +139,5 @@ namespace CarRentalSystem.Presentation.Controllers
 
             return RedirectToAction("MyReservations");
         }
-
-
-        //[HttpGet]
-        //public async Task<IActionResult> GetReservedDates(int vehicleId)
-        //{
-        //    var result = await _reservationService.GetReservedDatesAsync(vehicleId);
-
-        //    if (!result.IsSuccess)
-        //    {
-        //        return BadRequest(result.Error);
-        //    }
-
-        //    return Json(result.Value);
-        //}
-
-
     }
 }

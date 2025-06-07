@@ -5,7 +5,6 @@
         Active,
         Cancelled,
         Completed,
-        Paid,
         Overdue
     }
 }

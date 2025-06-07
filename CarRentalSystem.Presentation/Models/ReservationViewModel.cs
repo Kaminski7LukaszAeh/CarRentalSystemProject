@@ -15,5 +15,8 @@ namespace CarRentalSystem.Presentation.Models
         public string VehicleTypeName { get; set; }
         public DateTime CreatedAt { get; internal set; }
         public ReservationStatus Status { get; internal set; }
+        public PaymentStatus PaymentStatus { get; set; }
+        public string UserId { get; set; }
+        public bool IsReturned { get; set; }
     }
 }

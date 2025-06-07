@@ -16,5 +16,6 @@ namespace CarRentalSystem.DataAccess.Entities
         public decimal TotalCost { get; set; }
         public ReservationStatus Status { get; set; }
         public Payment Payment { get; set; }
+        public bool IsReturned { get; set; } = false;
     }
 }

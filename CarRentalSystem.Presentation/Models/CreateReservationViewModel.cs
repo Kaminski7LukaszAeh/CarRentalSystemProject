@@ -23,7 +23,8 @@ namespace CarRentalSystem.Presentation.Models
         [BindNever]
         public decimal TotalCost { get; set; }
         public decimal DailyRate { get; set; }
-
+        public bool IsReturned { get; set; }
+        
         public bool PayNow { get; set; }
     }
 }

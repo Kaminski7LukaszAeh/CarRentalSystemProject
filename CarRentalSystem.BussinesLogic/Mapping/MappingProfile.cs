@@ -71,11 +71,12 @@ namespace CarRentalSystem.BusinessLogic.Mapping
                 CreatedAt = DateTime.UtcNow.AddHours(2),
                 Status = ReservationStatus.Active,
                 TotalCost = dto.TotalCost,
+                IsReturned = dto.IsReturned,
                 Payment = new Payment
                 {
                     Amount = dto.TotalCost,
                     Status = PaymentStatus.Pending,
-                    PaymentConfirmationNumber = Guid.NewGuid().ToString(),
+                    PaymentConfirmationNumber = "Not Paid Yet"
                 }
             };
         }
@@ -184,7 +185,9 @@ namespace CarRentalSystem.BusinessLogic.Mapping
                 BrandName = entity.Vehicle?.VehicleModel?.Brand?.Name ?? "Unknown",
                 ModelName = entity.Vehicle?.VehicleModel?.Name ?? "Unknown",
                 VehicleTypeName = entity.Vehicle?.VehicleModel?.VehicleType?.TypeName ?? "Unknown",
-                Status = entity.Status
+                Status = entity.Status,
+                PaymentStatus = entity.Payment?.Status ?? PaymentStatus.Pending,
+                IsReturned = entity.IsReturned
             };
         }
 

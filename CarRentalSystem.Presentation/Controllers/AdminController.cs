@@ -1,4 +1,6 @@
 ﻿using CarRentalSystem.BusinessLogic.Interfaces;
+using CarRentalSystem.BusinessLogic.Services;
+using CarRentalSystem.DataAccess.Entities.Enums;
 using CarRentalSystem.Presentation.Mapping;
 using CarRentalSystem.Presentation.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -9,10 +11,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 public class AdminController : Controller
 {
     private readonly IVehicleService _vehicleService;
+    private readonly IReservationService _reservationService;
 
-    public AdminController(IVehicleService vehicleService)
+    public AdminController(IVehicleService vehicleService, IReservationService reservationService)
     {
         _vehicleService = vehicleService;
+        _reservationService = reservationService;
     }
 
     public IActionResult Index()
@@ -20,7 +24,6 @@ public class AdminController : Controller
         return View();
     }
 
-    // ===== Vehicle Types =====
     [HttpGet]
     public async Task<IActionResult> ManageVehicleTypes()
     {
@@ -66,7 +69,6 @@ public class AdminController : Controller
         return RedirectToAction(nameof(ManageVehicleTypes));
     }
 
-    // ===== Vehicle Brands =====
     [HttpGet]
     public async Task<IActionResult> ManageVehicleBrands()
     {
@@ -110,7 +112,6 @@ public class AdminController : Controller
         return RedirectToAction(nameof(ManageVehicleBrands));
     }
 
-    // ===== Vehicle Models =====
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -186,6 +187,36 @@ public class AdminController : Controller
         return View(model);
     }
 
+    public async Task<IActionResult> ManageReservations()
+    {
+        var result = await _reservationService.GetAllReservationsAsync();
+        if (!result.IsSuccess)
+        {
+            TempData["Error"] = result.Error;
+        }
+
+        var reservationViewModels = DtoToViewModelMapper.MapList(result.Value);
+
+        return View(reservationViewModels);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> UpdateReservationStatus(int reservationId, ReservationStatus status)
+    {
+        var result = await _reservationService.UpdateReservationStatusAsync(reservationId, status);
+
+        if (!result.IsSuccess)
+        {
+            TempData["Error"] = result.Error;
+        }
+        else
+        {
+            TempData["Success"] = "Status updated successfully.";
+        }
+
+        return RedirectToAction("ManageReservations");
+    }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -197,7 +228,6 @@ public class AdminController : Controller
         return RedirectToAction(nameof(ManageVehicleModels));
     }
 
-    // ===== Vehicles =====
     [HttpGet]
     public async Task<IActionResult> ManageVehicles()
     {
@@ -251,7 +281,6 @@ public class AdminController : Controller
         return RedirectToAction(nameof(ManageVehicles));
     }
 
-    // Fetch Endpoints(!)
     [HttpGet]
     public async Task<IActionResult> GetBrandsByType(int typeId)
     {
@@ -276,5 +305,23 @@ public class AdminController : Controller
 
         var models = result.Value.Select(m => new { id = m.Id, name = m.Name });
         return Json(models);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> MarkAsReturned(int reservationId)
+    {
+        var result = await _reservationService.MarkAsReturnedAsync(reservationId);
+
+        if (result.IsSuccess)
+        {
+            TempData["Success"] = result.Message ?? "Vehicle marked as returned.";
+        }
+        else
+        {
+            TempData["Error"] = result.Error ?? "Failed to mark vehicle as returned.";
+        }
+
+        return RedirectToAction(nameof(ManageReservations));
     }
 }

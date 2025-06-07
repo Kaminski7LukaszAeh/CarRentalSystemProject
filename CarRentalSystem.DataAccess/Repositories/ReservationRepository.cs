@@ -14,6 +14,20 @@ namespace CarRentalSystem.DataAccess.Repositories
             _context = context;
         }
 
+        public async Task<IEnumerable<Reservation>> GetAllReservationsAsync()
+        {
+            return await _context.Reservations
+                                 .Include(r => r.Vehicle)
+                                    .ThenInclude(vm => vm.VehicleModel)
+                                        .ThenInclude(m => m.Brand)
+                                .Include(r => r.Vehicle)
+                                    .ThenInclude(vm => vm.VehicleModel)
+                                        .ThenInclude(m => m.VehicleType)
+                                 .Include(r => r.User)
+                                 .Include(r => r.Payment)
+                                 .ToListAsync();
+        }
+
         public async Task<Reservation?> GetByIdAsync(int reservationId)
         {
             return await _context.Reservations
@@ -38,6 +52,7 @@ namespace CarRentalSystem.DataAccess.Repositories
         {
             return await _context.Reservations
                 .Where(r => r.VehicleId == vehicleId)
+                .Include(r => r.Payment)
                 .ToListAsync();
         }
         public async Task<IEnumerable<Reservation>> GetActiveReservationsByUserIdAsync(string userId)
@@ -49,9 +64,10 @@ namespace CarRentalSystem.DataAccess.Repositories
                 .Include(r => r.Vehicle)
                     .ThenInclude(vm => vm.VehicleModel)
                         .ThenInclude(m => m.VehicleType)
+                .Include(r => r.Payment)
                 .Where(r => r.UserId == userId &&
                             r.Status != ReservationStatus.Cancelled &&
-                            r.Status != ReservationStatus.Completed)
+                            (r.Status != ReservationStatus.Completed))
                 .ToListAsync();
         }
 
@@ -68,6 +84,7 @@ namespace CarRentalSystem.DataAccess.Repositories
                             (r.Status == ReservationStatus.Cancelled || r.Status == ReservationStatus.Completed))
                 .ToListAsync();
         }
+
         public async Task AddReservationAsync(Reservation reservation)
         {
             reservation.StartDate = reservation.StartDate.AddHours(2);

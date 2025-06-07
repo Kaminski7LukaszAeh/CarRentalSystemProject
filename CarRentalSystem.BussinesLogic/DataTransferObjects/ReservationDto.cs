@@ -16,5 +16,7 @@ namespace CarRentalSystem.BusinessLogic.DataTransferObjects
         public string BrandName { get; set; }
         public string ModelName { get; set; }
         public string VehicleTypeName { get; set; }
+        public bool IsReturned { get; set; }
+        public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
     }
 }

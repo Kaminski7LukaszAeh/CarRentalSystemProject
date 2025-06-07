@@ -114,6 +114,7 @@ namespace CarRentalSystem.BusinessLogic.Services
                 var hasPendingReservations = vehicle.Reservations.Any(r =>
                     r.Status != ReservationStatus.Cancelled &&
                     r.Status != ReservationStatus.Completed &&
+                    r.Status != ReservationStatus.Active &&
                     r.EndDate >= DateTime.UtcNow);
 
                 if (hasPendingReservations)
@@ -325,7 +326,6 @@ namespace CarRentalSystem.BusinessLogic.Services
                 return Result.Failure("An unexpected error occurred.");
             }
         }
-
 
         public async Task<Result<IEnumerable<VehicleBrandDto>>> GetBrandsByTypeAsync(int typeId)
         {
